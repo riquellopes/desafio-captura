@@ -53,14 +53,15 @@ class MonkHandler(metaclass=abc.ABCMeta):
         if not hasattr(self, callback):
             raise MonkException("The callback '{}', isn't valid method.".format(callback))
 
-        task = {}
-        task['url'] = url
-        task['klass'] = self.klass
-        task['name_handler'] = self.name
-        task['callback'] = callback
-        task['phantomjs'] = phantomjs
+        task = MonkTask(**{
+            "url": url,
+            "klass": self.klass,
+            "process_name": self.process_name,
+            "callback": callback,
+            "use_phantomjs": phantomjs
+        })
 
-        self.queue.set_task(task)
+        self.queue.put(task)
 
     def _write_on_csv(self):
         """
@@ -69,7 +70,7 @@ class MonkHandler(metaclass=abc.ABCMeta):
         return True
 
     @property
-    def name(self):
+    def process_name(self):
         """
             Recupera nome do processo.
         """
@@ -78,3 +79,19 @@ class MonkHandler(metaclass=abc.ABCMeta):
     @property
     def klass(self):
         return self.__class__.__name__
+
+
+class MonkTask(dict):
+
+    def to_job(self):
+        return self
+
+    def to_process(self):
+        process = self
+        process.update({"processed": False, "status": None})
+        return process
+
+    def __getattr__(self, name):
+        if name in self:
+            return self[name]
+        raise AttributeError("")

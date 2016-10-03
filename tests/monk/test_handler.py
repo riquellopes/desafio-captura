@@ -25,7 +25,7 @@ def test_raise_exception_when_domain_none():
 
 
 def test_method_results_dont_invoke_in_invalid_domain(mocker):
-    set_task = mocker.patch.object(MonkQueue, "set_task")
+    set_task = mocker.patch.object(MonkQueue, "put")
 
     class SieveHandler(MonkHandler):
         domain = "chaves.com.br"
@@ -43,7 +43,7 @@ def test_method_results_dont_invoke_in_invalid_domain(mocker):
 
 def test_method_results_invoke_in_valid_domain(mocker):
     mocker.patch("monk.handler.task_queued", return_value=False)
-    set_task = mocker.patch.object(MonkQueue, "set_task")
+    set_task = mocker.patch.object(MonkQueue, "put")
 
     class SieveHandler(MonkHandler):
         domain = "sieve.com.br"
@@ -88,4 +88,4 @@ def test_property_name_get_name_process(mocker):
 
     sieve = SieveHandler()
     sieve.start()
-    assert sieve.name == "monk_process_sievehandler"
+    assert sieve.process_name == "monk_process_sievehandler"

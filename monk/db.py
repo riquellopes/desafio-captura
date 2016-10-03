@@ -1,6 +1,7 @@
 import os
 import redis
 import hashlib
+import ujson as json
 from pickle import dumps, loads
 
 generate_task_id = lambda x: hashlib.md5(str(x).encode()).hexdigest()
@@ -29,9 +30,23 @@ class MonkQueue(MonkBase):
     def _result_key(self, key):
         return "{}:result:{}".format(self.__queue_key, key)
 
-    def set_task(self, task):
-        key = generate_task_id(task['url'])
-        self._db.rpush(self.__queue_key, dumps((task['callback'], self._result_key(key), task)))
+    def put(self, task):
+        """
+            Método enfileira task e guarda informações sobre o processo.
+        """
+        key = generate_task_id(task.url)
+
+        pipeline = self._db.pipeline()
+
+        # Salva informações do processo
+        pipeline.set(key, json.dumps(task.to_process()))
+
+        # Enfilera o JOB
+        pipeline.rpush(
+            self.__queue_key,
+            dumps((task.callback, self._result_key(key), task.to_job()))
+        )
+        pipeline.execute()
 
     def get(self):
         message = self._db.blpop(self.__queue_key)
