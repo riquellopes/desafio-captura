@@ -22,6 +22,3 @@ test:clean
 	 MONK_REDIS_DB=0\
 	 PYTHONPATH=.\
 	 ${PYTEST} tests/ -s -r a --color=yes -vvv
-
-run: clean
-	 PYTHONPATH=. ${PYTHON} main.py
