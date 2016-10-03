@@ -3,7 +3,7 @@ from functools import wraps
 from urllib.parse import urlsplit
 
 from .monk import MonkException
-from .queue import MonkQueue, generate_task_id, task_queued
+from .db import MonkQueue, generate_task_id, task_queued
 
 valid_domain = lambda domain, url: domain == urlsplit(url).netloc
 

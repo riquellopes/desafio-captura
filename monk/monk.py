@@ -18,7 +18,7 @@
     monk.save_csv("sieve.csv")
     monk.run()
 """
-from .queue import MonkQueue
+from .db import MonkQueue
 # from tornado.ioloop import IOLoop
 # import logging
 
