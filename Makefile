@@ -17,7 +17,7 @@ setup-local: setup
 	${PIP} install -r requirements_dev.txt
 
 test:clean
-	${PYTEST} -s -r a --color=yes -vvv
+	 PYTHONPATH=. ${PYTEST} tests/ -s -r a --color=yes -vvv
 
 run: clean
-	${PYTHON} main.py
+	 PYTHONPATH=. ${PYTHON} main.py
