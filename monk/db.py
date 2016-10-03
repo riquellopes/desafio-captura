@@ -18,8 +18,8 @@ class MonkBase:
     def __new__(cls):
         if cls._db is None:
             cls._db = redis.Redis(**{
-                'host': os.environ.get("MONK_REDIS_HOST", "localhost"),
-                'port': os.environ.get("MONK_REDIS_PORT", 6379),
+                'host': os.environ.get("MONK_REDIS_HOST"),
+                'port': os.environ.get("MONK_REDIS_PORT"),
                 'db': os.environ.get("MONK_REDIS_DB")
             })
         return super(MonkBase, cls).__new__(cls)

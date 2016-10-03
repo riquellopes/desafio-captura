@@ -17,7 +17,11 @@ setup-local: setup
 	${PIP} install -r requirements_dev.txt
 
 test:clean
-	 PYTHONPATH=. ${PYTEST} tests/ -s -r a --color=yes -vvv
+	 MONK_REDIS_HOST=localhost\
+	 MONK_REDIS_PORT=6379\
+	 MONK_REDIS_DB=0\
+	 PYTHONPATH=.\
+	 ${PYTEST} tests/ -s -r a --color=yes -vvv
 
 run: clean
 	 PYTHONPATH=. ${PYTHON} main.py
