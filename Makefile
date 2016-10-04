@@ -26,3 +26,12 @@ test: clean
 
 task: clean
 	PYTHONPATH=. ${PYTHON} tasks.py
+
+container-worker:
+	docker exec -it monk-worker bash
+
+container-redis:
+	docker exec -it monk-redis redis-cli
+
+clean-redis:
+	docker exec -it monk-redis redis-cli flushall

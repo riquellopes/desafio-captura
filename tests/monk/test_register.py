@@ -35,6 +35,9 @@ def test_when_name_module_empty():
     MonkRegister.add(TestHandler)
     assert isinstance(MonkRegister.new("TestHandler"), TestHandler)
 
+    register = MonkRegister()
+    assert isinstance(register.new("TestHandler"), TestHandler)
+
 
 def test_raiser_exception_when_invoke_a_invalid_class():
 

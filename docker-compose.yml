@@ -1,0 +1,20 @@
+version: '2'
+services:
+    work:
+      build: .
+      restart: always
+      container_name: monk-worker
+      volumes:
+       - .:/app
+      depends_on:
+       - redis
+      links:
+       - redis
+      env_file:
+       - .env
+      command: /bin/bash -c "python worker.py"
+    redis:
+      container_name: monk-redis
+      image: redis
+      expose:
+       - "6379"

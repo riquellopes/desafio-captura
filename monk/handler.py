@@ -136,6 +136,10 @@ class MonkRegister:
 
     @classmethod
     def new(cls, module):
+        return cls.get(module)()
+
+    @classmethod
+    def get(cls, module):
         if module in cls.__stack__:
-            return cls.__stack__[module]()
+            return cls.__stack__[module]
         raise MonkException("The module '{}' doesn't exist.".format(module))

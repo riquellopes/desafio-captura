@@ -11,9 +11,9 @@
     >>> monk --worker
     >>> monk -r epocacosmeticos --csv epoca.csv
 """
+from tornado.ioloop import IOLoop
 from .db import MonkQueue
-# from tornado.ioloop import IOLoop
-# import logging
+from .requests import MonkRequests
 
 
 class MonkException(Exception):
@@ -33,8 +33,14 @@ class MonkWorker:
                 """
                     Consome fila de processos
                 """
-                func, key, task = self.queue.get()
-                self._process_message(func, key, task)
+                callback, key, task = self.queue.get()
+                requests = MonkRequests(**{
+                    "callback": callback,
+                    "key": key,
+                    "task": task,
+                    "handler": self._register.get(task['klass'])
+                })
+                IOLoop.current().run_sync(requests.process)
             except KeyboardInterrupt:
                 break
 
@@ -46,6 +52,3 @@ class MonkWorker:
         if self._queue is None:
             self._queue = MonkQueue()
         return self._queue
-
-    def _process_message(self, func, key, task):
-        print(func, key, task)
