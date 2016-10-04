@@ -29,7 +29,8 @@ class MonkException(Exception):
 
 class MonkWorker:
 
-    def __init__(self):
+    def __init__(self, register):
+        self._register = register
         self._queue = None
         self._stop = False
 

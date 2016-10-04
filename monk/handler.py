@@ -104,12 +104,14 @@ class MonkRegister:
     __stack__ = OrderedDict()
 
     @classmethod
-    def add(cls, klass):
-        cls.add_m(klass.__name__, klass)
+    def add(cls, klass, disabled=False):
+        cls.add_m(klass.__name__, klass, disabled)
         return cls
 
     @classmethod
-    def add_m(cls, module, klass):
+    def add_m(cls, module, klass, disabled=False):
+        if disabled:
+            return cls
 
         if not inspect.isclass(klass):
             raise MonkException("The '{}', isn't a class.")

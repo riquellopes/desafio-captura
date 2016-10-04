@@ -27,6 +27,9 @@ class MonkBase:
 
 class MonkQueue(MonkBase):
 
+    def __init__(self):
+        self.__queue_key = "monk:jobs"
+
     def _result_key(self, key):
         return "{}:result:{}".format(self.__queue_key, key)
 
