@@ -10,13 +10,6 @@
 
     >>> monk --worker
     >>> monk -r epocacosmeticos --csv epoca.csv
-
-    monk = Monk(**{
-        "url": "http://sieve.com",
-        "sniffer": lambda x: x
-    })
-    monk.save_csv("sieve.csv")
-    monk.run()
 """
 from .db import MonkQueue
 # from tornado.ioloop import IOLoop
