@@ -16,9 +16,13 @@ setup: venv
 setup-local: setup
 	${PIP} install -r requirements_dev.txt
 
-test:clean
+test: clean
+	 MONK_TEST=True
 	 MONK_REDIS_HOST=localhost\
 	 MONK_REDIS_PORT=6379\
 	 MONK_REDIS_DB=0\
 	 PYTHONPATH=.\
 	 ${PYTEST} tests/ -s -r a --color=yes -vvv
+
+task: clean
+	PYTHONPATH=. ${PYTHON} tasks.py

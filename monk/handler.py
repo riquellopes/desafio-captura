@@ -1,6 +1,9 @@
 import abc
+import os
+import inspect
 from functools import wraps
 from urllib.parse import urlsplit
+from collections import OrderedDict
 
 from .monk import MonkException
 from .db import MonkQueue, generate_task_id, task_queued
@@ -95,3 +98,42 @@ class MonkTask(dict):
         if name in self:
             return self[name]
         raise AttributeError("")
+
+
+class MonkRegister:
+    __stack__ = OrderedDict()
+
+    @classmethod
+    def add(cls, klass):
+        cls.add_m(klass.__name__, klass)
+        return cls
+
+    @classmethod
+    def add_m(cls, module, klass):
+
+        if not inspect.isclass(klass):
+            raise MonkException("The '{}', isn't a class.")
+
+        if not issubclass(klass, MonkHandler):
+            raise MonkException("The class '{}', isn'n valid handler.".format(klass.__name__))
+
+        cls.__stack__[module] = klass
+        return cls
+
+    def __iter__(self):
+        return (
+            (item[1]()) for item in self.__stack__.items()
+        )
+
+    def __len__(self):
+        return len(self.__stack__)
+
+    @classmethod
+    def destruct(cls):
+        cls.__stack__ = OrderedDict()
+
+    @classmethod
+    def new(cls, module):
+        if module in cls.__stack__:
+            return cls.__stack__[module]()
+        raise MonkException("The module '{}' doesn't exist.".format(module))
