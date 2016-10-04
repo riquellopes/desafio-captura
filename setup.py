@@ -8,4 +8,4 @@ setup(name='monk',
       version=monk.__version__,
       description='Monk detective',
       package_data={'': ['*.cfg']},
-      packages=['monk'])
+      packages=['monk', 'handlers'])
