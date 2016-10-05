@@ -69,4 +69,9 @@ class MonkRedis(MonkBase):
 
     @classmethod
     def task_status(cls, task_id, status):
+        db = cls()
+        task = json.loads(db._db.get(task_id))
+        task['status'] = status
+        task['processed'] = True
+        db._db.set(task_id, json.dumps(task))
         return True
