@@ -1,4 +1,5 @@
 from monk.handler import MonkHandler
+from monk.html import MonkHtml
 
 
 class BlogHenriqueLopesHandler(MonkHandler):
@@ -11,4 +12,17 @@ class BlogHenriqueLopesHandler(MonkHandler):
         """
             Processa urls da home.
         """
-        print(response.body, "Response")
+        if response.code == 200:
+            html = MonkHtml(response.body)
+            for href in html.links:
+                if self.valid_href(href):
+                    self.requests(href, callback="post")
+
+    def post(self, response):
+        """
+            Salva infomações do post.
+        """
+        print("Response - OK {}".format(response.code))
+
+    def valid_href(self, href):
+        return href.split(".")[-1] == "html"

@@ -1,7 +1,7 @@
 .SILENT:
 PYTHON=$(shell which python)
 PIP=venv/bin/pip
-PYTEST=venv/bin/py.test
+PYTEST=$(shell which py.test)
 
 clean:
 	find . \( -name *.py[co] -o -name __pycache__ \) -delete
@@ -26,6 +26,12 @@ test-cov: clean
 
 task: clean
 	PYTHONPATH=. ${PYTHON} tasks.py
+
+container-test:
+	docker exec -it monk-worker make test
+
+container-task:
+	docker exec -it monk-worker make task
 
 container-worker:
 	docker exec -it monk-worker bash
