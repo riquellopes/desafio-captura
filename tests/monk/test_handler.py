@@ -97,7 +97,6 @@ def test_property_name_get_name_process(mocker):
         def results(self, response):
             assert response.code == 200
             assert response.body == "<b>Sucess</b>"
-            assert self.byte_to_html(bytes(response.body, 'utf-8')) == "<b>Sucess</b>"
 
     sieve = SieveHandler()
     sieve.start()

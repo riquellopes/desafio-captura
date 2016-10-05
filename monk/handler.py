@@ -109,12 +109,6 @@ class MonkHandler(metaclass=abc.ABCMeta):
     def klass(self):
         return self.__class__.__name__
 
-    def byte_to_html(self, body):
-        # @TODO remover método
-        if isinstance(body, bytes):
-            return body.decode('utf-8')
-        return body
-
 
 class MonkTask(dict):
 
