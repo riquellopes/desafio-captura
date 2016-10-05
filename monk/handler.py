@@ -32,7 +32,7 @@ def validate_target(func):
 
 
 def validate_callback(func):
-    # @TODO implementar o decoretor.
+    # @TODO implementar o decorator.
     @wraps(func)
     def wrapper(self, task, response):
         """
