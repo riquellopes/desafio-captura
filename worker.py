@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from monk.monk import MonkWorker
 from monk.log import logger
 from handlers import MonkRegister
