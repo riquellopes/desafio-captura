@@ -96,10 +96,13 @@ def test_property_name_get_name_process(mocker):
 
         def results(self, response):
             assert response.code == 200
-            assert response.body == "Sucess"
+            assert response.body == "<b>Sucess</b>"
+            assert self.byte_to_html(bytes(response.body, 'utf-8')) == "<b>Sucess</b>"
 
     sieve = SieveHandler()
     sieve.start()
     assert sieve.process_name == "monk_process_sievehandler"
 
-    sieve.callback({"url": "http://sieve.com.br", "callback": "results"}, mock_response(200, "Sucess", sieve.domain))
+    sieve.callback(
+        {"url": "http://sieve.com.br", "callback": "results"},
+        mock_response(200, "<b>Sucess</b>", sieve.domain))
