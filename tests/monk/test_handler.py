@@ -75,6 +75,7 @@ def test_raise_exception_if_callback_does_not_a_valid_method(mocker):
 
 
 def test_property_name_get_name_process(mocker):
+    mocker.patch("monk.handler.task_queued", return_value=False)
     mocker.patch("monk.handler.MonkQueue")
 
     class SieveHandler(MonkHandler):

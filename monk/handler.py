@@ -31,6 +31,17 @@ def validate_target(func):
     return wrapper
 
 
+def validate_callback(func):
+    # @TODO implementar o decoretor.
+    @wraps(func)
+    def wrapper(self, task, response):
+        """
+            Altera status do processo.
+        """
+        func(self, task, response)
+    return wrapper
+
+
 class MonkHandler(metaclass=abc.ABCMeta):
     """
         Classe genérica que dever ser herdada por todos os handlers que forem processados
@@ -65,6 +76,16 @@ class MonkHandler(metaclass=abc.ABCMeta):
         })
 
         self.queue.put(task)
+
+    @validate_callback
+    def callback(self, task, response):
+        """
+            Método processa callback.
+        """
+        task = MonkTask(**task)
+
+        # @TODO Adicionar log.
+        getattr(self, task.callback)(response)
 
     def _write_on_csv(self):
         """

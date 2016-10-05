@@ -18,11 +18,11 @@ setup-local: setup
 
 test: clean
 	 MONK_TEST=True
-	 MONK_REDIS_HOST=localhost\
-	 MONK_REDIS_PORT=6379\
-	 MONK_REDIS_DB=0\
-	 PYTHONPATH=.\
-	 ${PYTEST} tests/ -s -r a --color=yes -vvv
+	 PYTHONPATH=. ${PYTEST} tests/ -s -r a --color=yes -vvv
+
+test-cov: clean
+	MONK_TEST=True
+	PYTHONPATH=. ${PYTEST} tests/ --cov=monk
 
 task: clean
 	PYTHONPATH=. ${PYTHON} tasks.py
