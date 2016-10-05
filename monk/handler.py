@@ -89,7 +89,7 @@ class MonkHandler(metaclass=abc.ABCMeta):
         """
         task = MonkTask(**task)
 
-        # @TODO Adicionar log.
+        logger.info("Invoking method '{}', task - {}".format(task.callback, task.url))
         getattr(self, task.callback)(response)
 
     def _write_on_csv(self):
