@@ -11,4 +11,4 @@ class BlogHenriqueLopesHandler(MonkHandler):
         """
             Processa urls da home.
         """
-        print(response, "Response")
+        print(response.body, "Response")
