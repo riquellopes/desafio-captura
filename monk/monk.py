@@ -14,6 +14,7 @@
 from tornado.ioloop import IOLoop
 from .db import MonkQueue
 from .requests import MonkRequests
+from .log import logger
 
 
 class MonkException(Exception):
@@ -40,6 +41,7 @@ class MonkWorker:
                     "task": task,
                     "handler": self._register.get(task['klass'])
                 })
+                logger.info("Get task {} :: {}".format(key, task['url']))
                 IOLoop.current().run_sync(requests.process)
             except KeyboardInterrupt:
                 break

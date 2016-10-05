@@ -2,6 +2,7 @@ import os
 from tornado import gen
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 from fake_useragent import UserAgent
+from .log import logger
 
 
 class MonkRequests:
@@ -19,13 +20,13 @@ class MonkRequests:
 
     @gen.coroutine
     def process(self):
+        logger.info("Start requests process.")
         try:
             response = yield AsyncHTTPClient().fetch(self.request)
             handler = self._handler()
             handler.callback(self._task, response)
         except Exception as e:
-            # @TODO adionar log de erro.
-            print(e)
+            logger.exception(e)
 
     @property
     def url(self):

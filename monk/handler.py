@@ -6,6 +6,7 @@ from urllib.parse import urlsplit
 from collections import OrderedDict
 
 from .monk import MonkException
+from .log import logger
 from .db import MonkQueue, generate_task_id, task_queued
 
 valid_domain = lambda domain, url: domain == urlsplit(url).netloc
@@ -26,8 +27,7 @@ def validate_target(func):
         if valid_domain(self.domain, url) and not task_queued(url):
             return func(self, url, **kwargs)
         else:
-            # Adicionar log
-            pass
+            logger.warn("Url is queued or does not valid url - {}.".format(url))
     return wrapper
 
 

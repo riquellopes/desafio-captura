@@ -17,7 +17,7 @@ setup-local: setup
 	${PIP} install -r requirements_dev.txt
 
 test: clean
-	 MONK_TEST=True
+	 MONK_TEST=True\
 	 PYTHONPATH=. ${PYTEST} tests/ -s -r a --color=yes -vvv
 
 test-cov: clean

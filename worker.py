@@ -1,8 +1,10 @@
 from monk.monk import MonkWorker
+from monk.log import logger
 from handlers import MonkRegister
 
 
 def main():
+    logger.info("Start main worker")
     worker = MonkWorker(MonkRegister())
     worker.run()
 
