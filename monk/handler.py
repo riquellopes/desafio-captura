@@ -1,6 +1,7 @@
 import abc
 import os
 import inspect
+import copy
 from functools import wraps
 from urllib.parse import urlsplit
 from collections import OrderedDict
@@ -37,11 +38,12 @@ def validate_callback(func):
         """
             Altera status do processo.
         """
-        if task_status(task['id'], response.code):
-            logger.info("Task {} status code {}".format(task['id'], response.code))
+        logger.info("Update information about task {}.".format(str(task)))
+        if task_status(task['url'], response.code):
+            logger.info("Task {} status code {}".format(task['url'], response.code))
             func(self, task, response)
         else:
-            logger.warn("Task {} does not exist.".format(task['id']))
+            logger.warn("Task {} does not exist.".format(task['url']))
     return wrapper
 
 
@@ -114,7 +116,8 @@ class MonkTask(dict):
         return self
 
     def to_process(self):
-        process = self
+        # @TODO criar teste para essa copia de json.
+        process = copy.deepcopy(self)
         process.update({"processed": False, "status": None})
         return process
 

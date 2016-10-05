@@ -102,4 +102,4 @@ def test_property_name_get_name_process(mocker):
     sieve.start()
     assert sieve.process_name == "monk_process_sievehandler"
 
-    sieve.callback({"id": 000, "callback": "results"}, mock_response(200, "Sucess", sieve.domain))
+    sieve.callback({"url": "http://sieve.com.br", "callback": "results"}, mock_response(200, "Sucess", sieve.domain))

@@ -4,6 +4,8 @@ import hashlib
 import ujson as json
 from pickle import dumps, loads
 
+from .log import logger
+
 generate_task_id = lambda x: hashlib.md5(str(x).encode()).hexdigest()
 
 
@@ -12,8 +14,10 @@ def task_queued(url):
     return MonkRedis.task_queued(key)
 
 
-def task_status(task_id, status):
-    return MonkRedis.task_queued(task_id, status)
+def task_status(url, status):
+    logger.info("Call task_status({}, {})".format(url, status))
+    key = generate_task_id(url)
+    return MonkRedis.task_status(key, status)
 
 
 class MonkBase:
@@ -73,5 +77,6 @@ class MonkRedis(MonkBase):
         task = json.loads(db._db.get(task_id))
         task['status'] = status
         task['processed'] = True
+        logger.info("Update status task - {}.".format(str(task)))
         db._db.set(task_id, json.dumps(task))
         return True
