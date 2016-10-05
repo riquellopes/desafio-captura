@@ -12,6 +12,10 @@ def task_queued(url):
     return MonkRedis.task_queued(key)
 
 
+def task_status(task_id, status):
+    return MonkRedis.task_queued(task_id, status)
+
+
 class MonkBase:
     _db = None
 
@@ -62,3 +66,7 @@ class MonkRedis(MonkBase):
     def task_queued(cls, task_id):
         db = cls()
         return db._db.exists(task_id)
+
+    @classmethod
+    def task_status(cls, task_id, status):
+        return True

@@ -1,6 +1,15 @@
 import pytest
+from io import StringIO
+from tornado.httpclient import HTTPRequest
+from tornado.httpclient import HTTPResponse
+
 from monk import MonkException
 from monk.handler import MonkHandler, MonkQueue
+
+
+def mock_response(status_code, body, url):
+    request = HTTPRequest(url=url)
+    return HTTPResponse(request, status_code, None, StringIO(body))
 
 
 def test_raise_type_error_when_method_start_does_not_implemented():
@@ -76,6 +85,7 @@ def test_raise_exception_if_callback_does_not_a_valid_method(mocker):
 
 def test_property_name_get_name_process(mocker):
     mocker.patch("monk.handler.task_queued", return_value=False)
+    mocker.patch("monk.handler.task_status", return_value=True)
     mocker.patch("monk.handler.MonkQueue")
 
     class SieveHandler(MonkHandler):
@@ -85,8 +95,11 @@ def test_property_name_get_name_process(mocker):
             self.requests("http://sieve.com.br", callback="results")
 
         def results(self, response):
-            pass
+            assert response.code == 200
+            assert response.body == "Sucess"
 
     sieve = SieveHandler()
     sieve.start()
     assert sieve.process_name == "monk_process_sievehandler"
+
+    sieve.callback({"id": 000, "callback": "results"}, mock_response(200, "Sucess", sieve.domain))

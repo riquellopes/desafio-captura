@@ -7,7 +7,7 @@ from collections import OrderedDict
 
 from .monk import MonkException
 from .log import logger
-from .db import MonkQueue, generate_task_id, task_queued
+from .db import MonkQueue, generate_task_id, task_queued, task_status
 
 valid_domain = lambda domain, url: domain == urlsplit(url).netloc
 
@@ -32,13 +32,16 @@ def validate_target(func):
 
 
 def validate_callback(func):
-    # @TODO implementar o decorator.
     @wraps(func)
     def wrapper(self, task, response):
         """
             Altera status do processo.
         """
-        func(self, task, response)
+        if task_status(task['id'], response.code):
+            logger.info("Task {} status code {}".format(task['id'], response.code))
+            func(self, task, response)
+        else:
+            logger.warn("Task {} does not exist.".format(task['id']))
     return wrapper
 
 
