@@ -15,7 +15,7 @@ class BlogHenriqueLopesHandler(MonkHandler):
         if response.code == 200:
             html = MonkHtml(response.body)
             for href in html.links(".html"):
-                self.requests(href, callback="post")
+                self.requests(href['href'], callback="post")
 
     def post(self, response):
         """
