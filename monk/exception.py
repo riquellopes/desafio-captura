@@ -1,0 +1,2 @@
+class MonkException(Exception):
+    pass
