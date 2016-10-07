@@ -1,5 +1,5 @@
 import pytest
-from monk import MonkException
+from monk.exception import MonkException
 from monk.handler import MonkRegister, MonkHandler
 
 
@@ -13,10 +13,12 @@ def test_should_be_raised_exception_when_invalid_handler():
 
     with pytest.raises(MonkException) as e:
         MonkRegister.add_m("test_register", TestHandler)
-    assert "The class 'TestHandler', isn'n valid handler." in str(e.value)
+    assert "The class 'TestHandler', isn't valid handler." in str(e.value)
 
 
-def test_method_new_should_be_get_a_instance():
+def test_method_new_should_be_get_a_instance(mocker):
+    mocker.patch("monk.handler.MonkQueue")
+
     class TestHandler(MonkHandler):
         domain = "sieve.com"
 
@@ -26,7 +28,9 @@ def test_method_new_should_be_get_a_instance():
     assert isinstance(MonkRegister.new("test_register"), TestHandler)
 
 
-def test_when_name_module_empty():
+def test_when_name_module_empty(mocker):
+    mocker.patch("monk.handler.MonkQueue")
+
     class TestHandler(MonkHandler):
         domain = "sieve.com"
 
@@ -45,7 +49,9 @@ def test_raiser_exception_when_invoke_a_invalid_class():
         MonkRegister.new("any_thing")
 
 
-def test_stack_should_be_have_two_class():
+def test_stack_should_be_have_two_class(mocker):
+    mocker.patch("monk.handler.MonkQueue")
+
     MonkRegister.destruct()
     register = MonkRegister()
 

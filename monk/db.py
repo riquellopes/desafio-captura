@@ -14,16 +14,15 @@ def task_queued(url):
     return MonkRedis.task_queued(key)
 
 
-def task_status(url, status):
-    logger.info("Call task_status({}, {})".format(url, status))
-    key = generate_task_id(url)
-    return MonkRedis.task_status(key, status)
+def task_status(task, status):
+    logger.info("Call task_status({}, {})".format(task.url, status))
+    return MonkRedis.task_status(task, status)
 
 
 class MonkBase:
     _db = None
 
-    def __new__(cls):
+    def __new__(cls, *args, **kwargs):
         if cls._db is None:
             cls._db = redis.Redis(**{
                 'host': os.environ.get("MONK_REDIS_HOST"),
@@ -32,14 +31,24 @@ class MonkBase:
             })
         return super(MonkBase, cls).__new__(cls)
 
+processed_key = lambda key: "process:{}".format(key)
+
 
 class MonkQueue(MonkBase):
 
-    def __init__(self):
-        self.__queue_key = "monk:jobs"
+    def __init__(self, queue_name=""):
+        self.queue_name = queue_name
 
-    def _result_key(self, key):
-        return "{}:result:{}".format(self.__queue_key, key)
+    @property
+    def queue_name(self):
+        return self.__queue_name
+
+    @queue_name.setter
+    def queue_name(self, value):
+        queue_prefix = "monk:queue"
+        if value:
+            queue_prefix = "{}:{}".format(queue_prefix, value.lower())
+        self.__queue_name = queue_prefix
 
     def put(self, task):
         """
@@ -49,19 +58,36 @@ class MonkQueue(MonkBase):
 
         pipeline = self._db.pipeline()
 
-        # Salva informações do processo
-        pipeline.set(key, json.dumps(task.to_process()))
+        # Salva informações do processo.
+        pipeline.set(processed_key(key), json.dumps(task.to_process()))
+
+        # Encrementa quantidade de itens na fila.
+        pipeline.incr("rowed:{}".format(task.queue_name))
 
         # Enfilera o JOB
         pipeline.rpush(
-            self.__queue_key,
-            dumps((task.callback, self._result_key(key), task.to_job()))
+            self.queue_name,
+            dumps((task.callback, key, task.to_job()))
         )
+
         pipeline.execute()
 
     def get(self):
-        message = self._db.blpop(self.__queue_key)
+        message = self._db.blpop(self.queue_name)
         return loads(message[1])
+
+    @classmethod
+    def start(cls, queue_name):
+        redis = cls()
+        pipeline = redis._db.pipeline()
+        pipeline.set("rowed:{}".format(queue_name), 0)
+        pipeline.set("done:{}".format(queue_name), 0)
+
+    @classmethod
+    def done(cls, queue_name):
+        # @TODO Alterar closed False para True
+        redis = cls()
+        redis._db.incr("done:{}".format(queue_name), 0)
 
 
 class MonkRedis(MonkBase):
@@ -72,11 +98,32 @@ class MonkRedis(MonkBase):
         return db._db.exists(task_id)
 
     @classmethod
-    def task_status(cls, task_id, status):
+    def task_status(cls, task, status):
         db = cls()
-        task = json.loads(db._db.get(task_id))
-        task['status'] = status
-        task['processed'] = True
-        logger.info("Update status task - {}.".format(str(task)))
-        db._db.set(task_id, json.dumps(task))
+        return db.update(task.id, {
+            "status": status,
+            "processed": True
+        })
+
+    def prefix(self, pattern="*"):
+        return self._db.scan_iter(match="process:{}".format(pattern))
+
+    def write_row(self, task, row):
+        return self.update(task.id, {
+            "to_csv": row
+        })
+
+    def update(self, key, value):
+        result = self.get(key)
+        result.update(value or {})
+        logger.info("Update value task process - {}.".format(str(result)))
+        return self.set(key, result)
+
+    def get(self, key):
+        task_id = processed_key(key)
+        return json.loads(self._db.get(task_id))
+
+    def set(self, key, value):
+        task_id = processed_key(key)
+        self._db.set(task_id, json.dumps(value))
         return True

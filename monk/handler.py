@@ -6,9 +6,9 @@ from functools import wraps
 from urllib.parse import urlsplit
 from collections import OrderedDict
 
-from .monk import MonkException
+from .exception import MonkException
 from .log import logger
-from .db import MonkQueue, generate_task_id, task_queued, task_status
+from .db import MonkQueue, MonkRedis, generate_task_id, task_queued, task_status
 
 valid_domain = lambda domain, url: domain == urlsplit(url).netloc
 
@@ -39,7 +39,7 @@ def validate_callback(func):
             Altera status do processo.
         """
         logger.info("Update information about task {}.".format(str(task)))
-        if task_status(task['url'], response.code):
+        if task_status(task, response.code):
             logger.info("Task {} status code {}".format(task['url'], response.code))
             func(self, task, response)
         else:
@@ -54,8 +54,10 @@ class MonkHandler(metaclass=abc.ABCMeta):
     """
     domain = None
 
-    def __new__(cls):
-        cls.queue = MonkQueue()
+    def __new__(cls, *args, **kwargs):
+        cls.queue = MonkQueue(queue_name=cls._queue_name())
+        cls.redis = MonkRedis()
+        cls._task = None
         return super(MonkHandler, cls).__new__(cls)
 
     @abc.abstractmethod
@@ -63,6 +65,10 @@ class MonkHandler(metaclass=abc.ABCMeta):
         """
             Método que vai dar o boot na aplicação.
         """
+
+    def to_queue(self):
+        self.queue.start(queue_name=self._queue_name())
+        self.start()
 
     @validate_target
     def requests(self, url, callback, phantomjs=False):
@@ -72,42 +78,38 @@ class MonkHandler(metaclass=abc.ABCMeta):
         if not hasattr(self, callback):
             raise MonkException("The callback '{}', isn't valid method.".format(callback))
 
-        task = MonkTask(**{
+        self._task = MonkTask(**{
             "url": url,
             "klass": self.klass,
-            "process_name": self.process_name,
+            "queue_name": self._queue_name(),
             "callback": callback,
             "use_phantomjs": phantomjs
         })
 
-        self.queue.put(task)
+        self.queue.put(self._task)
 
     @validate_callback
     def callback(self, task, response):
-        """
-            Método processa callback.
-        """
-        task = MonkTask(**task)
+        self._task = task
 
-        logger.info("Invoking method '{}', task - {}".format(task.callback, task.url))
-        getattr(self, task.callback)(response)
+        logger.info("Invoking method '{}', task - {}".format(self._task.callback, self._task.url))
+        getattr(self, self._task.callback)(response)
 
-    def _write_on_csv(self):
+        self.queue.done(queue_name=self._queue_name())
+
+    def write_on_data(self, row):
         """
             Método utilizado para salvar um nova linha no arquivo csv.
         """
-        return True
-
-    @property
-    def process_name(self):
-        """
-            Recupera nome do processo.
-        """
-        return "monk_process_{}".format(self.__class__.__name__.lower())
+        return self.redis.write_row(self._task, row)
 
     @property
     def klass(self):
         return self.__class__.__name__
+
+    @classmethod
+    def _queue_name(cls):
+        return cls.__name__.lower()
 
 
 class MonkTask(dict):
@@ -116,15 +118,25 @@ class MonkTask(dict):
         return self
 
     def to_process(self):
-        # @TODO criar teste para essa copia de json.
         process = copy.deepcopy(self)
-        process.update({"processed": False, "status": None})
+        process.update({
+            "processed": False,  # Informa se o processo esta encerrado.
+            "status": None,  # Guarda o status HTTP recebido.
+            "closed": False,  # Informa se task esta totalmente encerrada.
+            "to_csv": None,  # Valor que deve ser salvo no csv
+        })
         return process
 
     def __getattr__(self, name):
         if name in self:
             return self[name]
         raise AttributeError("")
+
+    @property
+    def id(self):
+        if "url" not in self:
+            raise MonkException("Task doesn't have Url.")
+        return generate_task_id(self["url"])
 
 
 class MonkRegister:
@@ -144,7 +156,7 @@ class MonkRegister:
             raise MonkException("The '{}', isn't a class.")
 
         if not issubclass(klass, MonkHandler):
-            raise MonkException("The class '{}', isn'n valid handler.".format(klass.__name__))
+            raise MonkException("The class '{}', isn't valid handler.".format(klass.__name__))
 
         cls.__stack__[module] = klass
         return cls

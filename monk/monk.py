@@ -3,22 +3,18 @@
     o título e a url de cada página de produto[1] encontrada.
 
     1 - Conseguir recuperar todas as urls do site validas para o desafio.
-    2 - Fazer com que seja escalável.
-    3 - Não deixar que a mesma url seja consumida 2x
-    4 - Enfileirar os processos
-    5 - Todos os htmls serão baixados e processados off line?
-
-    >>> monk --worker
-    >>> monk -r epocacosmeticos --csv epoca.csv
+    2 - Fazer com que seja escalável. OK
+    3 - Não deixar que a mesma url seja consumida 2x. OK
+    4 - Enfileirar os processos. OK
+    5 - Criar um monitor para escrever csv.
+    6 - Aumentar a cobetura de testes.
+    7 - Criar uma fila por handler.
 """
 from tornado.ioloop import IOLoop
 from .db import MonkQueue
 from .requests import MonkRequests
+from .handler import MonkTask
 from .log import logger
-
-
-class MonkException(Exception):
-    pass
 
 
 class MonkWorker:
@@ -32,13 +28,13 @@ class MonkWorker:
         while not self._stop:
             try:
                 """
-                    Consome fila de processos
+                    Consome fila de processos.
                 """
                 callback, key, task = self.queue.get()
                 requests = MonkRequests(**{
                     "callback": callback,
                     "key": key,
-                    "task": task,
+                    "task": MonkTask(**task),
                     "handler": self._register.get(task['klass'])
                 })
                 logger.info("Get task {} :: {}".format(key, task['url']))
