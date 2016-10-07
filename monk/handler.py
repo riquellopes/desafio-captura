@@ -95,7 +95,7 @@ class MonkHandler(metaclass=abc.ABCMeta):
         logger.info("Invoking method '{}', task - {}".format(self._task.callback, self._task.url))
         getattr(self, self._task.callback)(response)
 
-        self.queue.done(queue_name=self._queue_name())
+        self.queue.done(queue_name=self._queue_name(), task=self._task)
 
     def write_on_data(self, row):
         """

@@ -76,18 +76,18 @@ class MonkQueue(MonkBase):
         message = self._db.blpop(self.queue_name)
         return loads(message[1])
 
-    @classmethod
-    def start(cls, queue_name):
-        redis = cls()
-        pipeline = redis._db.pipeline()
+    def start(self, queue_name):
+        pipeline = self._db.pipeline()
         pipeline.set("rowed:{}".format(queue_name), 0)
         pipeline.set("done:{}".format(queue_name), 0)
+        pipeline.execute()
 
-    @classmethod
-    def done(cls, queue_name):
-        # @TODO Alterar closed False para True
-        redis = cls()
-        redis._db.incr("done:{}".format(queue_name), 0)
+    def done(self, queue_name, task):
+        # @TODO trocar por pipeline.
+        self._db.incr("done:{}".format(queue_name))
+        MonkRedis.update(task.id, {
+            "closed": True
+        })
 
 
 class MonkRedis(MonkBase):

@@ -7,8 +7,8 @@
     3 - Não deixar que a mesma url seja consumida 2x. OK
     4 - Enfileirar os processos. OK
     5 - Criar um monitor para escrever csv.
-    6 - Aumentar a cobetura de testes.
-    7 - Criar uma fila por handler.
+    6 - Aumentar a cobetura de testes. 72%
+    7 - Criar uma fila por handler. OK
 """
 from tornado.ioloop import IOLoop
 from .db import MonkQueue
