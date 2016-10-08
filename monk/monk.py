@@ -10,6 +10,7 @@
     6 - Aumentar a cobetura de testes. 72%
     7 - Criar uma fila por handler. OK
 """
+import os
 from tornado.ioloop import IOLoop
 from .db import MonkQueue
 from .requests import MonkRequests
@@ -48,5 +49,5 @@ class MonkWorker:
     @property
     def queue(self):
         if self._queue is None:
-            self._queue = MonkQueue()
+            self._queue = MonkQueue(queue_name=os.environ.get("MONK_QUEUE_NAME", "bloghenriquelopeshandler"))
         return self._queue

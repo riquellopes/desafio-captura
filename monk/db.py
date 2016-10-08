@@ -31,12 +31,17 @@ class MonkBase:
             })
         return super(MonkBase, cls).__new__(cls)
 
+    @property
+    def db(self):
+        return self._db
+
 processed_key = lambda key: "process:{}".format(key)
 
 
 class MonkQueue(MonkBase):
 
     def __init__(self, queue_name=""):
+        # self.__queue_name_suffix = queue_name
         self.queue_name = queue_name
 
     @property
@@ -62,7 +67,7 @@ class MonkQueue(MonkBase):
         pipeline.set(processed_key(key), json.dumps(task.to_process()))
 
         # Encrementa quantidade de itens na fila.
-        pipeline.incr("rowed:{}".format(task.queue_name))
+        # pipeline.incr("rowed:{}".format(self.__queue_name_suffix))
 
         # Enfilera o JOB
         pipeline.rpush(
@@ -76,18 +81,39 @@ class MonkQueue(MonkBase):
         message = self._db.blpop(self.queue_name)
         return loads(message[1])
 
-    def start(self, queue_name):
-        pipeline = self._db.pipeline()
-        pipeline.set("rowed:{}".format(queue_name), 0)
-        pipeline.set("done:{}".format(queue_name), 0)
-        pipeline.execute()
+    def start(self):
+        # pipeline = self._db.pipeline()
+        # pipeline.set("rowed:{}".format(self.__queue_name_suffix), 0)
+        # pipeline.set("done:{}".format(self.__queue_name_suffix), 0)
+        # pipeline.execute()
+        pass
 
-    def done(self, queue_name, task):
+    def done(self, task):
         # @TODO trocar por pipeline.
-        self._db.incr("done:{}".format(queue_name))
-        MonkRedis.update(task.id, {
-            "closed": True
-        })
+        # self._db.incr("done:{}".format(self.__queue_name_suffix))
+
+        # redis = MonkRedis()
+        # redis.update(task.id, {
+        #     "closed": True
+        # })
+        pass
+
+    # def closed(self):
+    #     try:
+    #         pipeline = self._db.pipeline()
+    #         pipeline.get("rowed:{}".format(self.__queue_name_suffix))
+    #         pipeline.get("done:{}".format(self.__queue_name_suffix))
+    #         result = pipeline.execute()
+    #
+    #         return int(result[0]) == int(result[1])
+    #     except:
+    #         return False
+
+    def qsize(self):
+        return self._db.llen(self.queue_name)
+
+    def empty(self):
+        return self.qsize() == 0
 
 
 class MonkRedis(MonkBase):
@@ -95,7 +121,7 @@ class MonkRedis(MonkBase):
     @classmethod
     def task_queued(cls, task_id):
         db = cls()
-        return db._db.exists(task_id)
+        return db.db.exists(processed_key(task_id))
 
     @classmethod
     def task_status(cls, task, status):

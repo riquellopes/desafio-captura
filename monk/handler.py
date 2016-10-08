@@ -7,7 +7,9 @@ from urllib.parse import urlsplit
 from collections import OrderedDict
 
 from .exception import MonkException
+from .html import MonkHtml
 from .log import logger
+from .csv import MonkCSV
 from .db import MonkQueue, MonkRedis, generate_task_id, task_queued, task_status
 
 valid_domain = lambda domain, url: domain == urlsplit(url).netloc
@@ -24,6 +26,8 @@ def validate_target(func):
         """
         if self.domain is None:
             raise MonkException("The domain can't be null.")
+
+        url = MonkHtml.to_clear(url, enabled=True)
 
         if valid_domain(self.domain, url) and not task_queued(url):
             return func(self, url, **kwargs)
@@ -46,6 +50,8 @@ def validate_callback(func):
             logger.warn("Task {} does not exist.".format(task['url']))
     return wrapper
 
+rows = []
+
 
 class MonkHandler(metaclass=abc.ABCMeta):
     """
@@ -56,7 +62,8 @@ class MonkHandler(metaclass=abc.ABCMeta):
 
     def __new__(cls, *args, **kwargs):
         cls.queue = MonkQueue(queue_name=cls._queue_name())
-        cls.redis = MonkRedis()
+        # cls.redis = MonkRedis()
+        # cls._csv = MonkCSV(file_name=cls._csv_name())
         cls._task = None
         return super(MonkHandler, cls).__new__(cls)
 
@@ -67,8 +74,8 @@ class MonkHandler(metaclass=abc.ABCMeta):
         """
 
     def to_queue(self):
-        self.queue.start(queue_name=self._queue_name())
         self.start()
+        return self._queue_name()
 
     @validate_target
     def requests(self, url, callback, phantomjs=False):
@@ -95,13 +102,15 @@ class MonkHandler(metaclass=abc.ABCMeta):
         logger.info("Invoking method '{}', task - {}".format(self._task.callback, self._task.url))
         getattr(self, self._task.callback)(response)
 
-        self.queue.done(queue_name=self._queue_name(), task=self._task)
-
     def write_on_data(self, row):
         """
             Método utilizado para salvar um nova linha no arquivo csv.
         """
-        return self.redis.write_row(self._task, row)
+        rows.append(row)
+
+        if self.queue.empty() and len(rows):
+            csv = MonkCSV(file_name=self._csv_name())
+            csv.write(rows)
 
     @property
     def klass(self):
@@ -110,6 +119,10 @@ class MonkHandler(metaclass=abc.ABCMeta):
     @classmethod
     def _queue_name(cls):
         return cls.__name__.lower()
+
+    @classmethod
+    def _csv_name(cls):
+        return "{}.csv".format(cls._queue_name())
 
 
 class MonkTask(dict):

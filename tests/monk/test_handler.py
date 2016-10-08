@@ -102,12 +102,13 @@ def test_property_name_get_name_process(mocker):
             self.requests("http://sieve.com.br", callback="results")
 
         def results(self, response):
+            assert response.request.url == "sieve.com.br"
             assert response.code == 200
             assert response.body == "<b>Sucess</b>"
 
     sieve = SieveHandler()
-    sieve.start()
-    assert sieve._queue_name() == "sievehandler"
+    assert sieve.to_queue() == "sievehandler"
+    assert sieve._csv_name() == "sievehandler.csv"
 
     sieve.callback(
         MonkTask(**{"url": "http://sieve.com.br", "callback": "results"}),
