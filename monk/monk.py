@@ -6,11 +6,10 @@
     2 - Fazer com que seja escalável. OK
     3 - Não deixar que a mesma url seja consumida 2x. OK
     4 - Enfileirar os processos. OK
-    5 - Criar um monitor para escrever csv.
+    5 - Criar um monitor para escrever csv. OK
     6 - Aumentar a cobetura de testes. 72%
     7 - Criar uma fila por handler. OK
 """
-import os
 from tornado.ioloop import IOLoop
 from .db import MonkQueue
 from .requests import MonkRequests
@@ -49,5 +48,5 @@ class MonkWorker:
     @property
     def queue(self):
         if self._queue is None:
-            self._queue = MonkQueue(queue_name=os.environ.get("MONK_QUEUE_NAME", "bloghenriquelopeshandler"))
+            self._queue = MonkQueue(queue_name="bloghenriquelopeshandler")
         return self._queue

@@ -41,7 +41,6 @@ processed_key = lambda key: "process:{}".format(key)
 class MonkQueue(MonkBase):
 
     def __init__(self, queue_name=""):
-        # self.__queue_name_suffix = queue_name
         self.queue_name = queue_name
 
     @property
@@ -66,9 +65,6 @@ class MonkQueue(MonkBase):
         # Salva informações do processo.
         pipeline.set(processed_key(key), json.dumps(task.to_process()))
 
-        # Encrementa quantidade de itens na fila.
-        # pipeline.incr("rowed:{}".format(self.__queue_name_suffix))
-
         # Enfilera o JOB
         pipeline.rpush(
             self.queue_name,
@@ -82,32 +78,10 @@ class MonkQueue(MonkBase):
         return loads(message[1])
 
     def start(self):
-        # pipeline = self._db.pipeline()
-        # pipeline.set("rowed:{}".format(self.__queue_name_suffix), 0)
-        # pipeline.set("done:{}".format(self.__queue_name_suffix), 0)
-        # pipeline.execute()
         pass
 
     def done(self, task):
-        # @TODO trocar por pipeline.
-        # self._db.incr("done:{}".format(self.__queue_name_suffix))
-
-        # redis = MonkRedis()
-        # redis.update(task.id, {
-        #     "closed": True
-        # })
         pass
-
-    # def closed(self):
-    #     try:
-    #         pipeline = self._db.pipeline()
-    #         pipeline.get("rowed:{}".format(self.__queue_name_suffix))
-    #         pipeline.get("done:{}".format(self.__queue_name_suffix))
-    #         result = pipeline.execute()
-    #
-    #         return int(result[0]) == int(result[1])
-    #     except:
-    #         return False
 
     def qsize(self):
         return self._db.llen(self.queue_name)
@@ -130,9 +104,6 @@ class MonkRedis(MonkBase):
             "status": status,
             "processed": True
         })
-
-    def prefix(self, pattern="*"):
-        return self._db.scan_iter(match="process:{}".format(pattern))
 
     def write_row(self, task, row):
         return self.update(task.id, {
