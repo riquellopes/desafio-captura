@@ -42,7 +42,9 @@ class MonkRequests:
 
     @property
     def request(self):
-        request = HTTPRequest(url=self.url, method=self.method, user_agent=self.user_agent)
+        request = HTTPRequest(
+            url=self.url, method=self.method, user_agent=self.user_agent, follow_redirects=True
+        )
         return request
 
     @property

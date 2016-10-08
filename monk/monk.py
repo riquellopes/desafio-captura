@@ -48,5 +48,5 @@ class MonkWorker:
     @property
     def queue(self):
         if self._queue is None:
-            self._queue = MonkQueue(queue_name="bloghenriquelopeshandler")
+            self._queue = MonkQueue(queue_name="EpocaCosmeticosHandler".lower())
         return self._queue

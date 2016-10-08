@@ -106,11 +106,14 @@ class MonkHandler(metaclass=abc.ABCMeta):
         """
             Método utilizado para salvar um nova linha no arquivo csv.
         """
+        log.info("write_on_data call {}".format(str(row)))
         rows.append(row)
 
-        if self.queue.empty() and len(rows):
+        if self.queue.empty():
+            log.info("Queue:{} empty".format(self._queue_name()))
             csv = MonkCSV(file_name=self._csv_name())
             csv.write(rows)
+            logger.info("Monk THE AND. CSV {}, successfully".format(self._csv_name()))
 
     @property
     def klass(self):
