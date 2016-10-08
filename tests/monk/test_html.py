@@ -35,12 +35,33 @@ def test_link_method_can_recive_regex():
 
 def test_get_links_only_dot_html():
     html = MonkHtml(b"""
-        <a href="http://sieve.com.br/index.html">Sieve</a>
+        <a href="http://sieve.com.br/index.html#contact">Sieve</a>
         <a href="http://uol.com.br">Uol</a>
         <a href="http://hotelurbano.com.br">Hotelurbano</a>
         <a href="http://yahoo.com.br/noticias.html">Yahoo</a>
     """)
     links = list(html.links(".html"))
+    assert len(links) == 2
+
+    assert links[0]["text"] == "Sieve"
+    assert links[0]["href"] == "http://sieve.com.br/index.html#contact"
+
+
+def test_get_title_site_henrique_lopes():
+    html = MonkHtml(b"<title>Henrique Lopes</title>")
+
+    assert html.title == "Henrique Lopes"
+
+
+def test_remove_fragments():
+    html = MonkHtml(b"""
+        <a href="http://sieve.com.br/index.html#contact">Sieve</a>
+        <a href="http://uol.com.br">Uol</a>
+        <a href="http://hotelurbano.com.br">Hotelurbano</a>
+        <a href="http://yahoo.com.br/noticias.html#neymar">Yahoo</a>
+    """)
+
+    links = list(html.links(".html", fragment=False))
     assert len(links) == 2
 
     assert links[0]["text"] == "Sieve"
