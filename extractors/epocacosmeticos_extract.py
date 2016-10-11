@@ -30,7 +30,7 @@ class EpocaExtract(MonkHtml):
             if element:
                 return key
 
-    def extrat(self):
+    def extract(self):
         """
             Remove informações do produto.
             Recuperar informações do sku: http://www.epocacosmeticos.com.br/produto/sku/9341
