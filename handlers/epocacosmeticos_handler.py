@@ -5,10 +5,14 @@ from monk.log import logger
 
 
 class EpocaCosmeticosHandler(MonkHandler):
-    domain = "epocacosmeticos.com.br"
+    domain = "www.epocacosmeticos.com.br"
 
     def start(self):
-        self.requests("http://epocacosmeticos.com.br", callback="display_page")
+        """
+            Entrar na página chegar até a página do departamento e pegar a url de
+            páginação e ficar indo até acabar.
+        """
+        self.requests("http://www.epocacosmeticos.com.br", callback="display_page")
 
     def display_page(self, response):
         """

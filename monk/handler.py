@@ -12,6 +12,7 @@ from .log import logger
 from .csv import MonkCSV
 from .db import MonkQueue, MonkRedis, generate_task_id, task_queued, task_status
 
+
 valid_domain = lambda domain, url: domain == urlsplit(url).netloc
 
 
@@ -63,8 +64,6 @@ class MonkHandler(metaclass=abc.ABCMeta):
 
     def __new__(cls, *args, **kwargs):
         cls.queue = MonkQueue(queue_name=cls._queue_name())
-        # cls.redis = MonkRedis()
-        # cls._csv = MonkCSV(file_name=cls._csv_name())
         cls._task = None
         return super(MonkHandler, cls).__new__(cls)
 

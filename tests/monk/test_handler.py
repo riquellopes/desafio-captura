@@ -61,10 +61,10 @@ def test_method_results_invoke_in_valid_domain(mocker):
     set_task = mocker.patch.object(MonkQueue, "put")
 
     class SieveHandler(MonkHandler):
-        domain = "sieve.com.br"
+        domain = "www.sieve.com.br"
 
         def start(self):
-            self.requests("http://sieve.com.br", callback="results")
+            self.requests("http://www.sieve.com.br", callback="results")
 
         def results(self, response):
             pass

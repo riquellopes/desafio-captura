@@ -43,7 +43,8 @@ class MonkRequests:
     @property
     def request(self):
         request = HTTPRequest(
-            url=self.url, method=self.method, user_agent=self.user_agent, follow_redirects=True
+            url=self.url, method=self.method, user_agent=self.user_agent, follow_redirects=True,
+            connect_timeout=20.0
         )
         return request
 
