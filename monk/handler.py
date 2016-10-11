@@ -32,7 +32,8 @@ def validate_target(func):
         if valid_domain(self.domain, url) and not task_queued(url):
             return func(self, url, **kwargs)
         else:
-            logger.warn("Url is queued or does not valid url - {}.".format(url))
+            # logger.warn("Url is queued or does not valid url - {}.".format(url))
+            pass
     return wrapper
 
 
@@ -102,18 +103,18 @@ class MonkHandler(metaclass=abc.ABCMeta):
         logger.info("Invoking method '{}', task - {}".format(self._task.callback, self._task.url))
         getattr(self, self._task.callback)(response)
 
+        if self.queue.empty():
+            logger.info("Queue:{} empty".format(self._queue_name()))
+            csv = MonkCSV(file_name=self._csv_name())
+            csv.write(rows)
+            logger.info("Monk THE AND. CSV {}, successfully".format(self._csv_name()))
+
     def write_on_data(self, row):
         """
             Método utilizado para salvar um nova linha no arquivo csv.
         """
-        log.info("write_on_data call {}".format(str(row)))
+        logger.info("write_on_data call {}".format(str(row)))
         rows.append(row)
-
-        if self.queue.empty():
-            log.info("Queue:{} empty".format(self._queue_name()))
-            csv = MonkCSV(file_name=self._csv_name())
-            csv.write(rows)
-            logger.info("Monk THE AND. CSV {}, successfully".format(self._csv_name()))
 
     @property
     def klass(self):
