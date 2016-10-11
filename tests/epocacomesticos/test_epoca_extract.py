@@ -34,3 +34,11 @@ def test_when_method_where_i_am_in_page_departament_should_be_return_departament
     epoca = EpocaExtract(load_data("departamento"))
 
     assert epoca.where_i_am == "departament"
+
+
+def test_link_products_method_retrieving_29_links_page_one():
+    epoca = EpocaExtract(load_data("page_one"))
+
+    products = list(epoca.link_products())
+
+    assert len(products) == 29

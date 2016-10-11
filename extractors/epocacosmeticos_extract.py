@@ -19,7 +19,6 @@ class EpocaExtract(MonkHtml):
 
     @property
     def where_i_am(self):
-        # Home, Product, Departament
         xpaths = {
             "home": "//body[@class='home']",
             "product": "//body[@class='produto new']",
@@ -33,5 +32,19 @@ class EpocaExtract(MonkHtml):
 
     def extrat(self):
         """
-            Remove informações do produto
+            Remove informações do produto.
+            Recuperar informações do sku: http://www.epocacosmeticos.com.br/produto/sku/9341
         """
+
+    def link_products(self):
+        """
+            * Morte Súbita Super Hidratante Lola Cosmetics - Máscara Reconstrutora
+            * Morte Súbita Super Hidratante Lola Cosmetics - Máscara Recostrutora - Época Cosméticos
+
+            * Dream Cream Lola - Máscara para Cabelos - Época Cosméticos
+            * Dream Cream Lola - Máscara Para Cabelos
+        """
+        products = set()
+        for element in self.document.xpath("//a"):
+            products.add(element.get("href"))
+        return (product for product in products)
