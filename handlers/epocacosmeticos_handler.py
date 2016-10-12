@@ -1,7 +1,8 @@
 from urllib.parse import urlparse, urljoin
 from monk.handler import MonkHandler
-from monk.html import MonkHtml
 from monk.log import logger
+
+from extractors.epocacosmeticos_extract import EpocaExtract
 
 
 class EpocaCosmeticosHandler(MonkHandler):
@@ -16,25 +17,37 @@ class EpocaCosmeticosHandler(MonkHandler):
 
     def display_page(self, response):
         """
-            Processa urls da home.
+            Processa urls da home, abre requisições para todas as páginas de departamento.
         """
         if response.code == 200:
-            html = MonkHtml(response.body)
-            for href in html.links(fragment=False):
-                path = self.to_valid_path(href['href'])
-                if self.found_product(path):
-                    self.requests(path, callback="product_page")
-                else:
-                    self.requests(path, callback="display_page")
+            html = EpocaExtract(response.body)
+            for url in html.links_departament():
+                self.requests(self.to_valid_path(url), callback="departaments_page")
+
+    def departaments_page(self, response):
+        """
+            Reposta da página de departamento.
+        """
+        if response.code == 200:
+            html = EpocaExtract(response.body)
+            for url in html.links_pagination(self.domain, response.request.url):
+                self.requests(url, callback="product_pagination_page")
+
+    def product_pagination_page(self, response):
+        """
+            Extrai informações do resultado páginado.
+        """
+        if response.code == 200:
+            html = EpocaExtract(response.body)
+            for url in html.link_products():
+                if self.found_product(url):
+                    self.requests(url, callback="product_page")
 
     def product_page(self, response):
-        """
-            Tarefa processa página de produtos.
-        """
         logger.info("Product page status:{}".format(response.code))
         if response.code == 200:
-            html = MonkHtml(response.body)
-            self.write_on_data([html.title, response.request.url])
+            html = EpocaExtract(response.body)
+            self.write_on_data([html.name, html.title, html.url])
 
     @classmethod
     def found_product(cls, href):
