@@ -58,6 +58,20 @@ para não concorrer com os acessos do site. Eu diminuiria a quantidade de acesso
    $ make clean-redis
 ```
 
+### Criar setup fora do container e executar tarefas.
+
+```bash
+    $ make venv
+    $ source venv/bin/activate
+    $ make setup-local
+
+    $ make test # Para executar os testes da aplicação
+    $ make test-cov # Para ver a cobetura de testes.
+    $ make task # Para enfileirar todas as tarefas.
+
+    $ ./worker.py # Para processar todas tarefas enfileiradas.
+```
+
 ## Referências proxy:
     - http://proxymesh.com
     - http://www.ninjasproxy.com
