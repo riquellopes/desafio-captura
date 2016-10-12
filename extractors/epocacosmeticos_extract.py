@@ -2,6 +2,10 @@ from monk.html import MonkHtml
 
 
 class EpocaExtract(MonkHtml):
+    """
+        Remove informações do produto.
+        Recuperar informações do sku: http://www.epocacosmeticos.com.br/produto/sku/9341
+    """
 
     @property
     def departament_links(self):
@@ -33,14 +37,6 @@ class EpocaExtract(MonkHtml):
             element = self.document.xpath(xpath)
             if element:
                 return key
-
-    def extract(self):
-        """
-            Remove informações do produto.
-            Recuperar informações do sku: http://www.epocacosmeticos.com.br/produto/sku/9341
-        """
-        import ipdb; ipdb.set_trace()
-
 
     def link_products(self):
         """
