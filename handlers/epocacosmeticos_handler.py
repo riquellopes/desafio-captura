@@ -9,10 +9,6 @@ class EpocaCosmeticosHandler(MonkHandler):
     domain = "www.epocacosmeticos.com.br"
 
     def start(self):
-        """
-            Entrar na página chegar até a página do departamento e pegar a url de
-            páginação e ficar indo até acabar.
-        """
         self.requests("http://www.epocacosmeticos.com.br", callback="display_page")
 
     def display_page(self, response):
