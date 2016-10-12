@@ -43,7 +43,7 @@ para não concorrer com os acessos do site. Eu diminuiria a quantidade de acesso
   $ make container-task
 ```
 
-Ao fim do processo o worker irá gerar um arquivo com o nome do handler na raiz. **epocacosmeticoshandler.csv**
+> Ao fim do processo o worker irá gerar um arquivo com o nome do handler na raiz. **epocacosmeticoshandler.csv**
 
 
 ### Executar testes.
