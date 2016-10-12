@@ -12,7 +12,7 @@ def load_data(filename):
 
 def test_property_should_be_get_valid_urls():
     epoca = EpocaExtract(load_data("home"))
-    links = list(epoca.departament_links)
+    links = list(epoca.links_departament)
 
     assert links[0] == "http://www.epocacosmeticos.com.br/perfumes"
     assert links[1] == "http://www.epocacosmeticos.com.br/maquiagem"

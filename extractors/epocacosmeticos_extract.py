@@ -8,7 +8,7 @@ class EpocaExtract(MonkHtml):
     """
 
     @property
-    def departament_links(self):
+    def links_departament(self):
         return (element.get("href") for element in self.document.xpath("//a[@class='princ']"))
 
     @property
