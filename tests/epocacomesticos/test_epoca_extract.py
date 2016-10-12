@@ -42,3 +42,21 @@ def test_link_products_method_retrieving_29_links_page_one():
     products = list(epoca.link_products())
 
     assert len(products) == 29
+
+
+def test_product_one():
+    epoca = EpocaExtract(load_data("product_one"))
+
+    assert epoca.where_i_am == "product"
+    assert epoca.title == "Perfume 212 VIP Rosé - Carolina Herrera- Perfume Feminino - Época Cosméticos"
+    assert epoca.name == "212 VIP Rosé Eau de Parfum Carolina Herrera - Perfume Feminino"
+    assert epoca.url == "http://www.epocacosmeticos.com.br/212-vip-rose-eau-de-parfum-carolina-herrera-perfume-feminino/p"
+
+
+def test_product_two():
+    epoca = EpocaExtract(load_data("product_two"))
+
+    assert epoca.where_i_am == "product"
+    assert epoca.title == "J'adore Eau de Parfum Dior Perfume Feminino - Época Cosméticos"
+    assert epoca.name == "J'adore Eau de Parfum Dior - Perfume Feminino"
+    assert epoca.url == "http://www.epocacosmeticos.com.br/j-adore-eau-de-parfum-dior-perfume-feminino/p"

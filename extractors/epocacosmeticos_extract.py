@@ -9,6 +9,10 @@ class EpocaExtract(MonkHtml):
 
     @property
     def link_pagination(self):
+        """
+            Método recupera a url inicial e a outras devem ser geradas dinamicamente.
+            E devem ser chamadas até que o html não tenha mais informações validas.
+        """
         scripts = []
         for element in self.document.iter('script'):
             content = element.text_content()
@@ -35,6 +39,8 @@ class EpocaExtract(MonkHtml):
             Remove informações do produto.
             Recuperar informações do sku: http://www.epocacosmeticos.com.br/produto/sku/9341
         """
+        import ipdb; ipdb.set_trace()
+
 
     def link_products(self):
         """
@@ -48,3 +54,11 @@ class EpocaExtract(MonkHtml):
         for element in self.document.xpath("//a"):
             products.add(element.get("href"))
         return (product for product in products)
+
+    @property
+    def url(self):
+        return self.document.cssselect('meta[property="og:url"]')[0].get("content")
+
+    @property
+    def name(self):
+        return self.document.xpath("//div[contains(@class,'productName')]")[0].text
