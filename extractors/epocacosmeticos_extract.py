@@ -46,10 +46,7 @@ class EpocaExtract(MonkHtml):
             * Dream Cream Lola - Máscara para Cabelos - Época Cosméticos
             * Dream Cream Lola - Máscara Para Cabelos
         """
-        products = set()
-        for element in self.document.xpath("//a"):
-            products.add(element.get("href"))
-        return (product for product in products)
+        return set(element.get("href") for element in self.document.xpath("//a"))
 
     @property
     def url(self):
