@@ -68,7 +68,8 @@ class EpocaExtract(MonkHtml):
     def name(self):
         return self.document.xpath("//div[contains(@class,'productName')]")[0].text
 
-    def links_pagination(self, domain, link):
+    @classmethod
+    def links_pagination(cls, domain):
         """
             Passando o primeiro sem o número de páginação, ele desvolve um produto a mais.
             Perfumes até a página 50
@@ -79,20 +80,42 @@ class EpocaExtract(MonkHtml):
             Corpo e banho até a página 30
             Unhas até a página 12
             Ofertas e marcas não valem apena acessar.
+
+            - perfumes:
+                buscapagina?fq=C%3a%2f1000001%2f&PS=20&sl=3d564047-8ff1-4aa8-bacd-f11730c3fce6&cc=4&sm=0&PageNumber=
+
+            - maquiagem:
+                buscapagina?fq=C%3a%2f1000004%2f&PS=20&sl=3d564047-8ff1-4aa8-bacd-f11730c3fce6&cc=4&sm=0&PageNumber=
+
+            - cabelos:
+                buscapagina?fq=C%3a%2f1000037%2f&PS=20&sl=3d564047-8ff1-4aa8-bacd-f11730c3fce6&cc=4&sm=0&PageNumber=
+
+            - dermocosmeticos:
+                buscapagina?fq=C%3a%2f1000130%2f&PS=20&sl=3d564047-8ff1-4aa8-bacd-f11730c3fce6&cc=4&sm=0&PageNumber=
+
+            - tratamentos:
+                buscapagina?fq=C%3a%2f1000089%2f&PS=20&sl=3d564047-8ff1-4aa8-bacd-f11730c3fce6&cc=4&sm=0&PageNumber=
+
+            - corpo e banho:
+                buscapagina?fq=C%3a%2f1000070%2f&PS=20&sl=3d564047-8ff1-4aa8-bacd-f11730c3fce6&cc=4&sm=0&PageNumber=
+
+            - unhas:
+                buscapagina?fq=C%3a%2f1000013%2f&PS=20&sl=3d564047-8ff1-4aa8-bacd-f11730c3fce6&cc=4&sm=0&PageNumber=
         """
 
         paginations = {
-            "http://www.epocacosmeticos.com.br/perfumes": 50,
-            "http://www.epocacosmeticos.com.br/maquiagem": 50,
-            "http://www.epocacosmeticos.com.br/cabelos": 50,
-            "http://www.epocacosmeticos.com.br/dermocosmeticos": 38,
-            "http://www.epocacosmeticos.com.br/tratamentos": 39,
-            "http://www.epocacosmeticos.com.br/corpo-e-banho": 30,
-            "http://www.epocacosmeticos.com.br/unhas": 12
+            "http://www.epocacosmeticos.com.br/perfumes": {"last": 50, "code": "C%3a%2f1000001%2f"},
+            "http://www.epocacosmeticos.com.br/maquiagem": {"last": 50, "code": "C%3a%2f1000004%2f"},
+            "http://www.epocacosmeticos.com.br/cabelos": {"last": 50, "code": "C%3a%2f1000037%2f"},
+            "http://www.epocacosmeticos.com.br/dermocosmeticos": {"last": 38, "code": "C%3a%2f1000130%2f"},
+            "http://www.epocacosmeticos.com.br/tratamentos": {"last": 39, "code": "C%3a%2f1000089%2f"},
+            "http://www.epocacosmeticos.com.br/corpo-e-banho": {"last": 30, "code": "C%3a%2f1000070%2f"},
+            "http://www.epocacosmeticos.com.br/unhas": {"code": "C%3a%2f1000013%2f", "last": 12}
         }
 
-        yield self.link_pagination.format(domain=domain, page_number="")
-        end_range = paginations[link]
+        search_page = "http://{}/buscapagina?fq={}&PS=20&sl=3d564047-8ff1-4aa8-bacd-f11730c3fce6&cc=4&sm=0&PageNumber={}"
 
-        for page_number in range(2, end_range+1):
-            yield self.link_pagination.format(domain=domain, page_number=page_number)
+        for _, param in paginations.items():
+            yield search_page.format(domain, param["code"], "")
+            for page_number in range(2, param['last']+1):
+                yield search_page.format(domain, param["code"], page_number)

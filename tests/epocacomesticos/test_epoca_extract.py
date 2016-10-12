@@ -24,10 +24,15 @@ def test_property_should_be_get_valid_urls():
     assert links[6] == "http://www.epocacosmeticos.com.br/unhas"
 
 
-def test_get_pagination():
+def test_get_pagination_one():
     epoca = EpocaExtract(load_data("departamento"))
 
     assert epoca.link_pagination == "{domain}/buscapagina?fq=C%3a%2f1000037%2f&PS=20&sl=3d564047-8ff1-4aa8-bacd-f11730c3fce6&cc=4&sm=0&PageNumber={page_number}"
+
+
+def test_get_pagination_nails():
+    epoca = EpocaExtract(load_data("nails"))
+    assert epoca.link_pagination == "{domain}/buscapagina?fq=C%3a%2f1000013%2f&PS=20&sl=3d564047-8ff1-4aa8-bacd-f11730c3fce6&cc=4&sm=0&PageNumber={page_number}"
 
 
 def test_when_method_where_i_am_in_page_product_should_be_returnproduct():
@@ -76,9 +81,8 @@ def test_product_two():
 def test_links_pagination():
     epoca = EpocaExtract(load_data("departamento"))
     yield_paginations = epoca.links_pagination(
-        "www.epocacosmeticos.com.br",
-        "http://www.epocacosmeticos.com.br/unhas"
+        "www.epocacosmeticos.com.br"
     )
     paginations = list(yield_paginations)
 
-    assert len(paginations) == 12
+    assert len(paginations) == 269

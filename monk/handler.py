@@ -101,12 +101,7 @@ class MonkHandler(metaclass=abc.ABCMeta):
 
         logger.info("Invoking method '{}', task - {}".format(self._task.callback, self._task.url))
         getattr(self, self._task.callback)(response)
-
-        if self.queue.empty():
-            logger.info("Queue:{} empty".format(self._queue_name()))
-            csv = MonkCSV(file_name=self._csv_name())
-            csv.write(rows)
-            logger.info("Monk THE AND. CSV {}, successfully".format(self._csv_name()))
+        self._write_on_cvs()
 
     def write_on_data(self, row):
         """
@@ -118,6 +113,13 @@ class MonkHandler(metaclass=abc.ABCMeta):
     @property
     def klass(self):
         return self.__class__.__name__
+
+    def _write_on_cvs(self):
+        if self.queue.empty() and len(rows):
+            logger.info("Queue:{} empty".format(self._queue_name()))
+            csv = MonkCSV(file_name=self._csv_name())
+            csv.write(rows)
+            logger.info("Monk THE AND. CSV {}, successfully".format(self._csv_name()))
 
     @classmethod
     def _queue_name(cls):

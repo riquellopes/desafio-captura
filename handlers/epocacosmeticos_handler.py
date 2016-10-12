@@ -9,25 +9,8 @@ class EpocaCosmeticosHandler(MonkHandler):
     domain = "www.epocacosmeticos.com.br"
 
     def start(self):
-        self.requests("http://www.epocacosmeticos.com.br", callback="display_page")
-
-    def display_page(self, response):
-        """
-            Processa urls da home, abre requisições para todas as páginas de departamento.
-        """
-        if response.code == 200:
-            html = EpocaExtract(response.body)
-            for url in html.links_departament():
-                self.requests(self.to_valid_path(url), callback="departaments_page")
-
-    def departaments_page(self, response):
-        """
-            Reposta da página de departamento.
-        """
-        if response.code == 200:
-            html = EpocaExtract(response.body)
-            for url in html.links_pagination(self.domain, response.request.url):
-                self.requests(url, callback="product_pagination_page")
+        for url in EpocaExtract.links_pagination(self.domain):
+            self.requests(url, callback="product_pagination_page")
 
     def product_pagination_page(self, response):
         """

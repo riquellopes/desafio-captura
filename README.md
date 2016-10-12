@@ -5,8 +5,9 @@ Resolvi batizar a aplicação com o nome [Monk](https://pt.wikipedia.org/wiki/Mo
 construir essa aplicação eu utilizei [python3.5](https://www.python.org)+[tornado](http://www.tornadoweb.org/en/stable/)+[redis](http://redis.io)+[lxml](http://lxml.de). Para orquestrar todos esses serviços eu utilizei [Docker](https://www.docker.com/) e [Docker Compose](https://docs.docker.com/compose/). Estando com tudo configurado corretamente, basta executar o comando abaixo.
 
 ## Respostas:
-- O monk já foi modelado pesando nesse cenário. Talvez depois de analisar eu só precise ter mais workers rodando,
-para aumentar a velocidade da scraping.
+- O monk já foi modelado pesando nesse cenário. Ele precisa de apenas alguns refactores na feature que
+grava o csv. E quando o worker for executado, refatorar para ele abrir processos diferentes
+para cada handler. E depois analisar a quantidade de workers a mais eu preciso rodando, para aumentar a velocidade do scraping.
 - Eu usaria o phantomjs.
 - Eu usaria um proxy para maquiar a origem da requisição.
 - O scraping é um solução paleativa, para o cliente/site que não possui um xml/api/soap que possa ser consultado,
