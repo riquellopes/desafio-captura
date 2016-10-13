@@ -66,7 +66,8 @@ class EpocaExtract(MonkHtml):
 
     @property
     def name(self):
-        return self.document.xpath("//div[contains(@class,'productName')]")[0].text
+        product_name = self.document.xpath("//div[contains(@class,'productName')]")
+        return product_name[0].text if len(product_name) else "Nome não encontrado"
 
     @classmethod
     def links_pagination(cls, domain):

@@ -78,6 +78,13 @@ def test_product_two():
     assert epoca.url == "http://www.epocacosmeticos.com.br/j-adore-eau-de-parfum-dior-perfume-feminino/p"
 
 
+def test_name_should_be_returned_string_default_when_css_class_not_found():
+    epoca = EpocaExtract(b"<html></html>")
+
+    assert epoca.where_i_am is None
+    assert epoca.name == "Nome não encontrado"
+
+
 def test_links_pagination():
     epoca = EpocaExtract(load_data("departamento"))
     yield_paginations = epoca.links_pagination(
