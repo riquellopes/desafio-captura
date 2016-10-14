@@ -12,9 +12,9 @@ class BlogHenriqueLopesHandler(MonkHandler):
         if response.code == 200:
             html = MonkHtml(response.body)
             for href in html.links(".html", fragment=False):
-                self.requests(href['href'], callback="post")
+                self.requests(href['href'], callback="blog_post")
 
-    def post(self, response):
+    def blog_post(self, response):
         if response.code == 200:
             html = MonkHtml(response.body)
             self.write_on_data([html.title, response.request.url])
