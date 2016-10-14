@@ -5,7 +5,7 @@ from tornado.httpclient import HTTPRequest
 from tornado.httpclient import HTTPResponse
 
 from monk.requests import MonkRequests, AsyncHTTPClient
-from monk.handler import MonkTask, generate_task_id
+from monk.handler import MonkTask, generate_task_id, MonkHandler
 
 
 def fetch_mock(status_code=200, body="Sucesso"):
@@ -21,11 +21,14 @@ def fetch_mock(status_code=200, body="Sucesso"):
 
 
 def test_when_status_200_method_home_should_be_invoked(mocker):
-    mocker.patch("monk.handler.task_status", return_value=True)
+    mocker.patch('monk.requests.UserAgent')
 
-    class ResponseHandler():
+    class ResponseHandler(MonkHandler):
         response = None
         task = None
+
+        def start(self):
+            pass
 
         def callback(self, task, response):
             ResponseHandler.response = response
@@ -54,6 +57,7 @@ def test_when_status_200_method_home_should_be_invoked(mocker):
 
 
 def test_when_phantomjs_is_true_use_post_method_and_proxy_service(mocker):
+    mocker.patch('monk.requests.UserAgent')
     get = mocker.patch("monk.requests.os.environ.get")
     get.return_value = "http://phantom-service"
 
