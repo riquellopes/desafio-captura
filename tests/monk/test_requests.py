@@ -5,7 +5,7 @@ from tornado.httpclient import HTTPRequest
 from tornado.httpclient import HTTPResponse
 
 from monk.requests import MonkRequests, AsyncHTTPClient
-from monk.handler import MonkHandler
+from monk.handler import MonkTask, generate_task_id, MonkHandler
 
 
 def fetch_mock(status_code=200, body="Sucesso"):
@@ -21,16 +21,18 @@ def fetch_mock(status_code=200, body="Sucesso"):
 
 
 def test_when_status_200_method_home_should_be_invoked(mocker):
+    mocker.patch('monk.requests.UserAgent')
+
     class ResponseHandler(MonkHandler):
-        domain = "blog.henriquelopes.com.br"
+        response = None
+        task = None
 
         def start(self):
             pass
 
-        def home(self, response):
-            assert response.code == 200
-            assert response.body == "Sucesso"
-            assert response.error is None
+        def callback(self, task, response):
+            ResponseHandler.response = response
+            ResponseHandler.task = task
 
     fetch = mocker.patch.object(AsyncHTTPClient, "fetch")
     fetch.side_effect = fetch_mock()
@@ -38,16 +40,24 @@ def test_when_status_200_method_home_should_be_invoked(mocker):
     requests = MonkRequests(**{
         "callback": "home",
         "key": 999999,
-        "task": {"url": "http://blog.henriquelopes.com.br"},
+        "task": MonkTask(**{"url": "http://blog.henriquelopes.com.br"}),
         "handler": ResponseHandler,
     })
+
     IOLoop.current().run_sync(requests.process)
 
     assert requests.url == "http://blog.henriquelopes.com.br"
     assert requests.method == "GET"
 
+    assert ResponseHandler.response.body == "Sucesso"
+    assert ResponseHandler.response.code == 200
+    assert ResponseHandler.response.error is None
+    assert ResponseHandler.task.url == requests.url
+    assert ResponseHandler.task.id == generate_task_id(requests.url)
+
 
 def test_when_phantomjs_is_true_use_post_method_and_proxy_service(mocker):
+    mocker.patch('monk.requests.UserAgent')
     get = mocker.patch("monk.requests.os.environ.get")
     get.return_value = "http://phantom-service"
 
