@@ -9,18 +9,12 @@ class BlogHenriqueLopesHandler(MonkHandler):
         self.requests("http://blog.henriquelopes.com.br", callback="responses")
 
     def responses(self, response):
-        """
-            Processa urls da home.
-        """
         if response.code == 200:
             html = MonkHtml(response.body)
             for href in html.links(".html", fragment=False):
                 self.requests(href['href'], callback="post")
 
     def post(self, response):
-        """
-            Salva infomações do post.
-        """
         if response.code == 200:
             html = MonkHtml(response.body)
             self.write_on_data([html.title, response.request.url])
