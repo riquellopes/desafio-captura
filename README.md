@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/riquellopes/desafio-captura.svg?branch=master)](https://travis-ci.org/riquellopes/desafio-captura)
+
+
 Desafio Captura
 ===============
 
