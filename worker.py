@@ -10,5 +10,6 @@ def main():
     worker = MonkWorker(MonkRegister())
     worker.run()
 
+
 if __name__ == "__main__":
     main()
