@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/riquellopes/desafio-captura.svg?branch=master)](https://travis-ci.org/riquellopes/desafio-captura)
+[![Coverage Status](https://coveralls.io/repos/github/riquellopes/desafio-captura/badge.svg?branch=master)](https://coveralls.io/github/riquellopes/desafio-captura?branch=master)
 
 
 Desafio Captura
