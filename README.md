@@ -5,7 +5,7 @@
 Desafio Captura
 ===============
 
-Resolvi batizar a aplicação com o nome [Monk](https://pt.wikipedia.org/wiki/Monk), uma referências ao seriado. Para
+Resolvi batizar a aplicação com o nome [Monk](https://pt.wikipedia.org/wiki/Monk), uma referência ao seriado. Para
 construir essa aplicação eu utilizei [python3.5](https://www.python.org)+[tornado](http://www.tornadoweb.org/en/stable/)+[redis](http://redis.io)+[lxml](http://lxml.de). Para orquestrar todos esses serviços eu utilizei [Docker](https://www.docker.com/) e [Docker Compose](https://docs.docker.com/compose/). Estando com tudo configurado corretamente, basta executar o comando abaixo.
 
 ## Respostas:
@@ -24,12 +24,6 @@ para não concorrer com os acessos do site. Eu diminuiria a quantidade de acesso
 
 ```bash
     $ docker-compose up
-
-    # No MacOsx a primeira vez
-    $ docker-machine start
-    $ docker-machine env
-    $ eval $(docker-machine env)
-
     $ docke-compose up or docke-compose stop
 ```
 
@@ -70,7 +64,6 @@ para não concorrer com os acessos do site. Eu diminuiria a quantidade de acesso
     $ make setup-local
 
     $ make test # Para executar os testes da aplicação
-    $ make test-cov # Para ver a cobetura de testes.
     $ make task # Para enfileirar todas as tarefas.
 
     $ ./worker.py # Para processar todas tarefas enfileiradas.
