@@ -1,3 +1,4 @@
+# coding: utf-8
 from urllib.parse import urlparse, urljoin
 from monk.handler import MonkHandler
 from monk.log import logger
@@ -14,7 +15,7 @@ class EpocaCosmeticosHandler(MonkHandler):
 
     def product_pagination_page(self, response):
         """
-            Extrai informações do resultado páginado.
+            Extrair informações do resultado páginado.
         """
         if response.code == 200:
             html = EpocaExtract(response.body)
