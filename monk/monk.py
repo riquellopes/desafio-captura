@@ -2,7 +2,7 @@
     Escreva um crawler que visite o site epocacosmeticos.com.br e salve um arquivo .csv com o nome do produto,
     o título e a url de cada página de produto[1] encontrada.
 
-    1 - Conseguir recuperar todas as urls do site validas para o desafio.
+    1 - Conseguir recuperar todas as urls do site validas para o desafio. OK
     2 - Fazer com que seja escalável. OK
     3 - Não deixar que a mesma url seja consumida 2x. OK
     4 - Enfileirar os processos. OK
@@ -11,6 +11,7 @@
     7 - Criar uma fila por handler. OK
 """
 from tornado.ioloop import IOLoop
+
 from .db import MonkQueue
 from .requests import MonkRequests
 from .handler import MonkTask
@@ -40,7 +41,7 @@ class MonkWorker:
                 logger.info("Get task {} :: {}".format(key, task['url']))
                 IOLoop.current().run_sync(requests.process)
             except KeyboardInterrupt:
-                break
+                self.stop()
 
     def stop(self):
         self._stop = True
@@ -48,5 +49,5 @@ class MonkWorker:
     @property
     def queue(self):
         if self._queue is None:
-            self._queue = MonkQueue(queue_name="EpocaCosmeticosHandler".lower())
+            self._queue = MonkQueue(queue_name="dummy".lower())
         return self._queue
