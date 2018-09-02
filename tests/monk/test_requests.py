@@ -1,8 +1,7 @@
 from io import StringIO
 from tornado.ioloop import IOLoop
 from tornado.concurrent import Future
-from tornado.httpclient import HTTPRequest
-from tornado.httpclient import HTTPResponse
+from tornado.httpclient import HTTPRequest, HTTPError, HTTPResponse
 
 from monk.requests import MonkRequests, AsyncHTTPClient
 from monk.handler import MonkTask, generate_task_id, MonkHandler
@@ -71,3 +70,44 @@ def test_when_phantomjs_is_true_use_post_method_and_proxy_service(mocker):
     assert requests.method == "POST"
     assert requests.phantomjs
     assert requests.url == "http://phantom-service"
+
+
+def test_should_get_erro_500_when_request_get_except(mocker):
+    mocker.patch('monk.requests.UserAgent')
+
+    class ResponseHandler(MonkHandler):
+        response = None
+        task = None
+
+        def start(self):
+            pass
+
+        def callback(self, task, response):
+            ResponseHandler.response = response
+            ResponseHandler.task = task
+
+    fetch = mocker.patch.object(AsyncHTTPClient, "fetch")
+
+    def error_except(request, **kwargs):
+        raise Exception("Error.")
+
+    fetch.side_effect = error_except
+
+    requests = MonkRequests(**{
+        "callback": "home",
+        "key": 999999,
+        "task": MonkTask(**{"url": "http://blog.henriquelopes.com.br"}),
+        "handler": ResponseHandler,
+    })
+
+    IOLoop.current().run_sync(requests.process)
+
+    assert requests.url == "http://blog.henriquelopes.com.br"
+    assert requests.method == "GET"
+
+    assert ResponseHandler.response.body == "Error to process request."
+    assert ResponseHandler.response.code == 500
+
+    assert isinstance(ResponseHandler.response.error, HTTPError)
+    assert ResponseHandler.task.url == requests.url
+    assert ResponseHandler.task.id == generate_task_id(requests.url)

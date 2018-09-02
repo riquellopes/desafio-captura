@@ -18,7 +18,7 @@ setup-local: setup
 
 test: clean
 	 MONK_TEST=True\
-	 PYTHONPATH=. ${PYTEST} tests/ -s -r a --color=yes -vvv --cov=monk --cov-report term-missing
+	 PYTHONPATH=. ${PYTEST} tests/${path} -s -r a --color=yes -vvv --cov=monk --cov-report term-missing
 
 task: clean
 	PYTHONPATH=. ${PYTHON} tasks.py

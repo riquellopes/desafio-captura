@@ -1,8 +1,12 @@
+# coding: utf-8
 import os
+from io import StringIO
 from tornado import gen
-from tornado.httpclient import AsyncHTTPClient, HTTPRequest
+from tornado.httpclient import AsyncHTTPClient, HTTPRequest, HTTPResponse
 from fake_useragent import UserAgent
-from .log import logger
+
+# core
+from monk.log import logger
 
 
 class MonkRequests:
@@ -23,10 +27,19 @@ class MonkRequests:
         logger.info("Start requests process.")
         try:
             response = yield AsyncHTTPClient().fetch(self.request)
-            handler = self._handler()
-            handler.callback(self._task, response)
-        except Exception as e:
-            logger.exception(e)
+        except Exception:
+            message = "Error to process request."
+            logger.exception(message)
+
+            response = HTTPResponse(
+                self.request,
+                500,
+                None,
+                StringIO(message)
+            )
+
+        handler = self._handler()
+        handler.callback(self._task, response)
 
     @property
     def url(self):
