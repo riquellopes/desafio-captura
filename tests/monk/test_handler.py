@@ -4,7 +4,8 @@ from tornado.httpclient import HTTPRequest
 from tornado.httpclient import HTTPResponse
 
 from monk.exception import MonkException
-from monk.handler import MonkHandler, MonkQueue, MonkTask
+from monk.handler.handler import MonkQueue
+from monk.handler import MonkHandler, MonkTask
 
 
 def mock_response(status_code, body, url):
@@ -13,7 +14,7 @@ def mock_response(status_code, body, url):
 
 
 def test_raise_type_error_when_method_start_does_not_implemented(mocker):
-    mocker.patch("monk.handler.MonkQueue")
+    mocker.patch("monk.handler.handler.MonkQueue")
 
     class SieveHandler(MonkHandler):
         pass
@@ -24,7 +25,7 @@ def test_raise_type_error_when_method_start_does_not_implemented(mocker):
 
 
 def test_raise_exception_when_domain_none(mocker):
-    mocker.patch("monk.handler.MonkQueue")
+    mocker.patch("monk.handler.handler.MonkQueue")
 
     class SieveHandler(MonkHandler):
 
@@ -56,8 +57,7 @@ def test_method_results_dont_invoke_in_invalid_domain(mocker):
 
 
 def test_method_results_invoke_in_valid_domain(mocker):
-    # mocker.patch.object(MonkQueue, "start")
-    mocker.patch("monk.handler.task_queued", return_value=False)
+    mocker.patch("monk.handler.handler.task_queued", return_value=False)
     set_task = mocker.patch.object(MonkQueue, "put")
 
     class SieveHandler(MonkHandler):
@@ -75,8 +75,7 @@ def test_method_results_invoke_in_valid_domain(mocker):
 
 
 def test_raise_exception_if_callback_does_not_a_valid_method(mocker):
-    # mocker.patch.object(MonkQueue, "start")
-    mocker.patch("monk.handler.task_queued", return_value=False)
+    mocker.patch("monk.handler.handler.task_queued", return_value=False)
 
     class SieveHandler(MonkHandler):
         domain = "sieve.com.br"
@@ -91,9 +90,9 @@ def test_raise_exception_if_callback_does_not_a_valid_method(mocker):
 
 
 def test_property_name_get_name_process(mocker):
-    mocker.patch("monk.handler.task_queued", return_value=False)
-    mocker.patch("monk.handler.task_status", return_value=True)
-    mocker.patch("monk.handler.MonkQueue")
+    mocker.patch("monk.handler.handler.task_queued", return_value=False)
+    mocker.patch("monk.handler.handler.task_status", return_value=True)
+    mocker.patch("monk.handler.handler.MonkQueue")
 
     class SieveHandler(MonkHandler):
         domain = "sieve.com.br"

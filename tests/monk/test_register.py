@@ -17,7 +17,7 @@ def test_should_be_raised_exception_when_invalid_handler():
 
 
 def test_method_new_should_be_get_a_instance(mocker):
-    mocker.patch("monk.handler.MonkQueue")
+    mocker.patch("monk.handler.handler.MonkQueue")
 
     class TestHandler(MonkHandler):
         domain = "sieve.com"
@@ -29,7 +29,7 @@ def test_method_new_should_be_get_a_instance(mocker):
 
 
 def test_when_name_module_empty(mocker):
-    mocker.patch("monk.handler.MonkQueue")
+    mocker.patch("monk.handler.handler.MonkQueue")
 
     class TestHandler(MonkHandler):
         domain = "sieve.com"
@@ -50,7 +50,7 @@ def test_raiser_exception_when_invoke_a_invalid_class():
 
 
 def test_stack_should_be_have_two_class(mocker):
-    mocker.patch("monk.handler.MonkQueue")
+    mocker.patch("monk.handler.handler.MonkQueue")
 
     MonkRegister.destruct()
     register = MonkRegister()

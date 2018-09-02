@@ -1,3 +1,4 @@
+# coding: utf-8
 from handlers.epocacosmeticos_handler import EpocaCosmeticosHandler
 
 

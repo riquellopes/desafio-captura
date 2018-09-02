@@ -1,10 +1,12 @@
+# coding: utf-8
 from io import StringIO
 from tornado.ioloop import IOLoop
 from tornado.concurrent import Future
 from tornado.httpclient import HTTPRequest, HTTPError, HTTPResponse
 
 from monk.requests import MonkRequests, AsyncHTTPClient
-from monk.handler import MonkTask, generate_task_id, MonkHandler
+from monk.handler.handler import generate_task_id
+from monk.handler import MonkTask, MonkHandler
 
 
 def fetch_mock(status_code=200, body="Sucesso"):

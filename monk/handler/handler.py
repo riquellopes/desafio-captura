@@ -1,3 +1,4 @@
+# coding: utf-8
 import abc
 import os
 import inspect
@@ -6,14 +7,21 @@ from functools import wraps
 from urllib.parse import urlsplit
 from collections import OrderedDict
 
-from .exception import MonkException
-from .html import MonkHtml
-from .log import logger
-from .csv import MonkCSV
-from .db import MonkQueue, MonkRedis, generate_task_id, task_queued, task_status
+from monk.exception import MonkException
+from monk.html import MonkHtml
+from monk.log import logger
+from monk.csv import MonkCSV
+from monk.db import MonkQueue, MonkRedis, generate_task_id, task_queued, task_status
+from .task import MonkTask
+
+rows = []
 
 
-valid_domain = lambda domain, url: domain == urlsplit(url).netloc
+def valid_domain(domain, url):
+    """
+        Valida se url processada faz parte do domínio a ser raspado.
+    """
+    return domain == urlsplit(url).netloc
 
 
 def validate_target(func):
@@ -51,8 +59,6 @@ def validate_callback(func):
         else:
             logger.warn("Task {} does not exist.".format(task['url']))
     return wrapper
-
-rows = []
 
 
 class MonkHandler(metaclass=abc.ABCMeta):
@@ -128,75 +134,3 @@ class MonkHandler(metaclass=abc.ABCMeta):
     @classmethod
     def _csv_name(cls):
         return "{}.csv".format(cls._queue_name())
-
-
-class MonkTask(dict):
-
-    def to_job(self):
-        return self
-
-    def to_process(self):
-        process = copy.deepcopy(self)
-        process.update({
-            "processed": False,  # Informa se o processo esta encerrado.
-            "status": None,  # Guarda o status HTTP recebido.
-            "closed": False,  # Informa se task esta totalmente encerrada.
-            "to_csv": None,  # Valor que deve ser salvo no csv
-        })
-        return process
-
-    def __getattr__(self, name):
-        if name in self:
-            return self[name]
-        raise AttributeError("")
-
-    @property
-    def id(self):
-        if "url" not in self:
-            raise MonkException("Task doesn't have Url.")
-        return generate_task_id(self["url"])
-
-
-class MonkRegister:
-    __stack__ = OrderedDict()
-
-    @classmethod
-    def add(cls, klass, disabled=False):
-        cls.add_m(klass.__name__, klass, disabled)
-        return cls
-
-    @classmethod
-    def add_m(cls, module, klass, disabled=False):
-        if disabled:
-            return cls
-
-        if not inspect.isclass(klass):
-            raise MonkException("The '{}', isn't a class.")
-
-        if not issubclass(klass, MonkHandler):
-            raise MonkException("The class '{}', isn't valid handler.".format(klass.__name__))
-
-        cls.__stack__[module] = klass
-        return cls
-
-    def __iter__(self):
-        return (
-            (item[1]()) for item in self.__stack__.items()
-        )
-
-    def __len__(self):
-        return len(self.__stack__)
-
-    @classmethod
-    def destruct(cls):
-        cls.__stack__ = OrderedDict()
-
-    @classmethod
-    def new(cls, module):
-        return cls.get(module)()
-
-    @classmethod
-    def get(cls, module):
-        if module in cls.__stack__:
-            return cls.__stack__[module]
-        raise MonkException("The module '{}' doesn't exist.".format(module))
