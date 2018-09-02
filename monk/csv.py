@@ -1,5 +1,6 @@
+# coding: utf-8
 import csv
-from .exception import MonkException
+from monk.exception import MonkException
 
 
 class MonkCSV:
@@ -22,6 +23,7 @@ class MonkCSV:
                 for row in rows:
                     writer.writerows([row, ])
                 f.close()
+
+                return True
         except TypeError:
             raise MonkException("Csv wasn't written.")
-        return True
