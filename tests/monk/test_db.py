@@ -4,19 +4,19 @@ from monk.handler import MonkTask
 
 
 def test_when_a_name_queue_to_defined_it_concat_a_prefix(mocker):
-    mocker.patch("monk.db.redis.Redis")
+    mocker.patch("monk.db.db.redis.Redis")
     queue = MonkQueue("minha_fila")
     assert queue.queue_name == "monk:queue:minha_fila"
 
 
 def test_when_none_name_to_defined(mocker):
-    mocker.patch("monk.db.redis.Redis")
+    mocker.patch("monk.db.db.redis.Redis")
     queue = MonkQueue()
     assert queue.queue_name == "monk:queue"
 
 
 def test_task_status_should_be_update_http_status(mocker):
-    mock = mocker.patch("monk.db.redis.Redis")
+    mock = mocker.patch("monk.db.db.redis.Redis")
     mock.return_value.get.return_value = json.dumps({
         "url": "http://siever.com",
         "klass": "Siever",
@@ -47,7 +47,7 @@ def test_task_status_should_be_update_http_status(mocker):
 
 
 def test_method_write_row(mocker):
-    mock = mocker.patch("monk.db.redis.Redis")
+    mock = mocker.patch("monk.db.db.redis.Redis")
     mock.return_value.get.return_value = json.dumps({
         "url": "http://s.com.br",
         "klass": "Si",

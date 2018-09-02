@@ -1,22 +1,19 @@
+# coding: utf-8
 import os
 import redis
 import hashlib
 import ujson as json
 from pickle import dumps, loads
 
-from .log import logger
-
-generate_task_id = lambda x: hashlib.md5(str(x).encode()).hexdigest()
+from monk.log import logger
 
 
-def task_queued(url):
-    key = generate_task_id(url)
-    return MonkRedis.task_queued(key)
+def generate_task_id(key):
+    return hashlib.md5(str(key).encode()).hexdigest()
 
 
-def task_status(task, status):
-    logger.info("Call task_status({}, {})".format(task.url, status))
-    return MonkRedis.task_status(task, status)
+def processed_key(key):
+    return "process:{}".format(key)
 
 
 class MonkBase:
@@ -34,8 +31,6 @@ class MonkBase:
     @property
     def db(self):
         return self._db
-
-processed_key = lambda key: "process:{}".format(key)
 
 
 class MonkQueue(MonkBase):
@@ -63,6 +58,7 @@ class MonkQueue(MonkBase):
         pipeline = self._db.pipeline()
 
         # Salva informações do processo.
+        logger.info("Enfileirando key {}".format(key))
         pipeline.set(processed_key(key), json.dumps(task.to_process()))
 
         # Enfilera o JOB
@@ -88,39 +84,3 @@ class MonkQueue(MonkBase):
 
     def empty(self):
         return self.qsize() == 0
-
-
-class MonkRedis(MonkBase):
-
-    @classmethod
-    def task_queued(cls, task_id):
-        db = cls()
-        return db.db.exists(processed_key(task_id))
-
-    @classmethod
-    def task_status(cls, task, status):
-        db = cls()
-        return db.update(task.id, {
-            "status": status,
-            "processed": True
-        })
-
-    def write_row(self, task, row):
-        return self.update(task.id, {
-            "to_csv": row
-        })
-
-    def update(self, key, value):
-        result = self.get(key)
-        result.update(value or {})
-        logger.info("Update value task process - {}.".format(str(result)))
-        return self.set(key, result)
-
-    def get(self, key):
-        task_id = processed_key(key)
-        return json.loads(self._db.get(task_id))
-
-    def set(self, key, value):
-        task_id = processed_key(key)
-        self._db.set(task_id, json.dumps(value))
-        return True
