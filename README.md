@@ -11,7 +11,7 @@ construir essa aplicação eu utilizei [python3.5](https://www.python.org)+[torn
 ## Respostas:
 - O monk já foi modelado pesando nesse cenário. Ele precisa de apenas alguns refactores na feature que
 grava o csv. E quando o worker for executado, refatorar para ele abrir processos diferentes
-para cada handler. E depois analisar a quantidade de workers a mais eu preciso rodando, para aumentar a velocidade do scraping.
+para cada handler. E depois analisar a quantidade de workers a mais é preciso executar, para aumentar a velocidade do scraping.
 - Eu usaria o phantomjs.
 - Eu usaria um proxy para maquiar a origem da requisição.
 - O scraping é um solução paleativa, para o cliente/site que não possui um xml/api/soap que possa ser consultado,
