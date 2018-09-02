@@ -1,5 +1,7 @@
+# coding: utf-8
 import ujson as json
 from monk.db import MonkQueue, MonkRedis
+from redis import Redis
 from monk.handler import MonkTask
 
 
@@ -76,3 +78,19 @@ def test_method_write_row(mocker):
 
     assert redis.write_row(task, ("Sieve do Brasil", "07/10/2016 0:47"))
     MonkRedis._db = None
+
+
+def test_empty_method_get_true_when_queue_is_empty(mocker):
+    MonkQueue._db = None
+    mocker.patch.object(Redis, "llen", return_value=0)
+
+    redis = MonkQueue()
+    assert redis.empty()
+
+
+def test_empty_method_get_false_when_queue_isnot_empty(mocker):
+    MonkQueue._db = None
+    mocker.patch.object(Redis, "llen", return_value=1)
+
+    redis = MonkQueue()
+    assert redis.empty() is False

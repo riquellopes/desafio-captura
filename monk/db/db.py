@@ -73,14 +73,8 @@ class MonkQueue(MonkBase):
         message = self._db.blpop(self.queue_name)
         return loads(message[1])
 
-    def start(self):
-        pass
-
-    def done(self, task):
-        pass
-
     def qsize(self):
-        return self._db.llen(self.queue_name)
+        return self.db.llen(self.queue_name)
 
     def empty(self):
         return self.qsize() == 0
